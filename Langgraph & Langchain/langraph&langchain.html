@@ -302,6 +302,11 @@
   <div class="nav-item" onclick="goto(7)"><div class="nav-dot"></div>State Management <span class="chapter-badge">08</span></div>
   <div class="nav-item" onclick="goto(8)"><div class="nav-dot"></div>Conditional Edges <span class="chapter-badge">09</span></div>
   <div class="nav-item" onclick="goto(9)"><div class="nav-dot"></div>Full Agent Build <span class="chapter-badge">10</span></div>
+
+  <div class="section-label" style="margin-top:1rem;">Q&amp;A Deep Dives</div>
+  <div class="nav-item" onclick="goto(10)"><div class="nav-dot"></div>What is invoke()? <span class="chapter-badge">11</span></div>
+  <div class="nav-item" onclick="goto(11)"><div class="nav-dot"></div>The | Pipe Chain <span class="chapter-badge">12</span></div>
+  <div class="nav-item" onclick="goto(12)"><div class="nav-dot"></div>State in LangGraph <span class="chapter-badge">13</span></div>
 </aside>
 
 <main id="mainContent">
@@ -1097,6 +1102,251 @@ graph = builder.compile(checkpointer=<span class="cl">MemorySaver</span>())
 
   <div class="nav-btns">
     <button class="btn btn-secondary" onclick="goto(8)">← Back</button>
+    <button class="btn btn-primary" onclick="goto(10)">Next: Q&amp;A Deep Dives →</button>
+  </div>
+</div>
+
+<!-- LESSON 10: WHAT IS INVOKE -->
+<div class="lesson" id="lesson-10">
+  <div class="lesson-tag tag-lc">Chapter 11 — Q&amp;A Deep Dive</div>
+  <h1>What does <code>invoke()</code> do?</h1>
+  <p class="lesson-subtitle">The standard execution method for every Runnable in LangChain's LCEL interface.</p>
+
+  <h2>Core Idea</h2>
+  <p><code>invoke</code> is the primary way to <strong>execute</strong> anything in LangChain. Every object that implements the <strong>Runnable interface</strong> — LLMs, prompt templates, chains, retrievers, agents — exposes <code>.invoke()</code>.</p>
+  <p>It takes an input and returns an output by running it through the component.</p>
+
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">python</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div>
+    <pre><span class="cm"># On an LLM</span>
+response = llm.invoke(<span class="st">"What is RAG?"</span>)
+
+<span class="cm"># On a prompt template</span>
+prompt = <span class="cl">ChatPromptTemplate</span>.from_template(<span class="st">"Tell me about {topic}"</span>)
+result = prompt.invoke({<span class="st">"topic"</span>: <span class="st">"LangChain"</span>})
+
+<span class="cm"># On a full chain</span>
+chain = prompt <span class="op">|</span> llm <span class="op">|</span> output_parser
+result = chain.invoke({<span class="st">"topic"</span>: <span class="st">"LangChain"</span>})</pre>
+  </div>
+
+  <h2>The Runnable Interface</h2>
+  <p><code>invoke</code> is part of a consistent interface that all LCEL components share — meaning you can swap any component freely and it always responds the same way.</p>
+
+  <table>
+    <tr><th>Method</th><th>Purpose</th></tr>
+    <tr><td><code>invoke</code></td><td>Run once, return single output</td></tr>
+    <tr><td><code>batch</code></td><td>Run on a list of inputs</td></tr>
+    <tr><td><code>stream</code></td><td>Stream output tokens as they arrive</td></tr>
+    <tr><td><code>ainvoke</code></td><td>Async version of invoke</td></tr>
+  </table>
+
+  <h2>invoke in a RAG Pipeline</h2>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">python</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div>
+    <pre>retriever = vectorstore.as_retriever()
+chain = (
+    {<span class="st">"context"</span>: retriever, <span class="st">"question"</span>: <span class="cl">RunnablePassthrough</span>()}
+    <span class="op">|</span> prompt
+    <span class="op">|</span> llm
+    <span class="op">|</span> <span class="cl">StrOutputParser</span>()
+)
+
+<span class="cm"># invoke kicks off the whole pipeline</span>
+answer = chain.invoke(<span class="st">"What does this document say about X?"</span>)</pre>
+  </div>
+
+  <p>When you call <code>invoke</code> on the chain, it:</p>
+  <div class="diagram">
+<span class="node">1.</span> Passes the input through the <span class="node">retriever</span> to fetch relevant docs
+<span class="node">2.</span> Injects them into the <span class="node">prompt template</span>
+<span class="node">3.</span> Sends the formatted prompt to the <span class="node">LLM</span>
+<span class="node">4.</span> Parses and returns the <span class="node">output</span>
+  </div>
+
+  <div class="callout callout-info">
+    <strong>🔑 Key Point</strong>
+    Think of <code>invoke</code> as the <em>"run this now, give me the result"</em> method. It replaced the older <code>.run()</code> and <code>.__call__()</code> patterns in LangChain, unifying the interface across all component types under LCEL.
+  </div>
+
+  <div class="nav-btns">
+    <button class="btn btn-secondary" onclick="goto(9)">← Back</button>
+    <button class="btn btn-primary" onclick="goto(11)">Next: The | Pipe Chain →</button>
+  </div>
+</div>
+
+<!-- LESSON 11: PIPE CHAIN -->
+<div class="lesson" id="lesson-11">
+  <div class="lesson-tag tag-lc">Chapter 12 — Q&amp;A Deep Dive</div>
+  <h1>How does the <code>|</code> pipe chain work?</h1>
+  <p class="lesson-subtitle">LCEL's pipe operator — the cleanest way to compose LangChain components.</p>
+
+  <h2>Yes, that's how chains are defined</h2>
+  <p>The <code>|</code> (pipe) syntax is <strong>LCEL — LangChain Expression Language</strong>. The operator chains components together where the output of one becomes the input of the next.</p>
+
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">python</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div>
+    <pre>chain = prompt <span class="op">|</span> llm <span class="op">|</span> <span class="cl">StrOutputParser</span>()</pre>
+  </div>
+  <p>Reads as: <em>"take a prompt → feed it to the LLM → parse the output as a string"</em></p>
+
+  <h2>Step by Step</h2>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">python</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div>
+    <pre><span class="cm"># 1. Prompt template - formats your input into a message</span>
+prompt = <span class="cl">ChatPromptTemplate</span>.from_template(<span class="st">"Tell me about {topic}"</span>)
+
+<span class="cm"># 2. LLM - takes the formatted prompt, returns an AIMessage</span>
+llm = <span class="cl">ChatOpenAI</span>(model=<span class="st">"gpt-4"</span>)
+
+<span class="cm"># 3. Parser - extracts just the string text from AIMessage</span>
+parser = <span class="cl">StrOutputParser</span>()
+
+<span class="cm"># 4. Pipe them together into one Runnable</span>
+chain = prompt <span class="op">|</span> llm <span class="op">|</span> parser
+
+<span class="cm"># 5. Invoke the whole pipeline</span>
+chain.invoke({<span class="st">"topic"</span>: <span class="st">"RAG systems"</span>})</pre>
+  </div>
+
+  <h2>What flows through</h2>
+  <div class="diagram">
+<span class="label">{</span><span class="node">"topic": "RAG systems"</span><span class="label">}</span>
+        <span class="arrow">↓  prompt</span>
+<span class="node">"Tell me about RAG systems"</span>  <span class="label">(formatted ChatPromptValue)</span>
+        <span class="arrow">↓  llm</span>
+<span class="node">AIMessage(content="RAG is...")</span>  <span class="label">(raw LLM response object)</span>
+        <span class="arrow">↓  StrOutputParser</span>
+<span class="node">"RAG is..."</span>  <span class="label">(plain string)</span>
+  </div>
+
+  <h2>Why the | works</h2>
+  <p>Under the hood, <code>|</code> calls <code>__or__</code> which wraps everything in a <code>RunnableSequence</code>. So these two are equivalent:</p>
+
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">python</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div>
+    <pre><span class="cm"># Pipe syntax (clean)</span>
+chain = prompt <span class="op">|</span> llm <span class="op">|</span> parser
+
+<span class="cm"># Equivalent verbose form</span>
+chain = <span class="cl">RunnableSequence</span>(first=prompt, middle=[llm], last=parser)</pre>
+  </div>
+
+  <h2>More Complex: RAG fan-in</h2>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">python</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div>
+    <pre>chain = (
+    {<span class="st">"context"</span>: retriever, <span class="st">"question"</span>: <span class="cl">RunnablePassthrough</span>()}
+    <span class="op">|</span> prompt
+    <span class="op">|</span> llm
+    <span class="op">|</span> <span class="cl">StrOutputParser</span>()
+)</pre>
+  </div>
+  <p>Here a dict is used to <strong>fan-in</strong> multiple sources (retrieved docs + the original question) before hitting the prompt. <code>RunnablePassthrough()</code> just passes the input unchanged.</p>
+
+  <div class="callout callout-tip">
+    <strong>💡 In short</strong>
+    <code>|</code> is syntactic sugar for building a pipeline of Runnables, which you then execute with <code>.invoke()</code>. Every step must have compatible input/output types.
+  </div>
+
+  <div class="nav-btns">
+    <button class="btn btn-secondary" onclick="goto(10)">← Back</button>
+    <button class="btn btn-primary" onclick="goto(12)">Next: State in LangGraph →</button>
+  </div>
+</div>
+
+<!-- LESSON 12: STATE IN LANGGRAPH Q&A -->
+<div class="lesson" id="lesson-12">
+  <div class="lesson-tag tag-lg">Chapter 13 — Q&amp;A Deep Dive</div>
+  <h1>What is State in LangGraph?</h1>
+  <p class="lesson-subtitle">State is the shared data object passed between nodes — the "memory" of your workflow at any moment.</p>
+
+  <h2>Core Idea</h2>
+  <p>Think of state as a <strong>snapshot of everything the graph knows right now</strong> as it moves through nodes. Every node <strong>reads from</strong> and <strong>writes to</strong> this state object.</p>
+
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">python</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div>
+    <pre><span class="kw">from</span> typing <span class="kw">import</span> <span class="cl">TypedDict</span>, <span class="cl">List</span>
+
+<span class="kw">class</span> <span class="cl">AgentState</span>(<span class="cl">TypedDict</span>):
+    messages: <span class="cl">List</span>[str]
+    current_step: str
+    retrieved_docs: <span class="cl">List</span>[str]
+    final_answer: str</pre>
+  </div>
+
+  <h2>How it flows</h2>
+  <div class="diagram">
+<span class="node">START</span>
+  <span class="arrow">↓</span>
+<span class="node">[Node A]</span> <span class="label">→ reads state, does work, updates state</span>
+  <span class="arrow">↓</span>
+<span class="node">[Node B]</span> <span class="label">→ reads updated state, does more work, updates state</span>
+  <span class="arrow">↓</span>
+<span class="node">[Node C]</span> <span class="label">→ reads state, produces final output</span>
+  <span class="arrow">↓</span>
+<span class="node">END</span>
+
+<span class="label">No node talks directly to another — they only communicate through state.</span>
+  </div>
+
+  <h2>Simple Example</h2>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">python</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div>
+    <pre><span class="kw">class</span> <span class="cl">State</span>(<span class="cl">TypedDict</span>):
+    question: str
+    retrieved_docs: str
+    answer: str
+
+<span class="cm"># Each node receives state and returns ONLY what changed</span>
+<span class="kw">def</span> <span class="fn">retrieve</span>(state: <span class="cl">State</span>):
+    docs = retriever.invoke(state[<span class="st">"question"</span>])
+    <span class="kw">return</span> {<span class="st">"retrieved_docs"</span>: docs}      <span class="cm"># only update what changed</span>
+
+<span class="kw">def</span> <span class="fn">generate</span>(state: <span class="cl">State</span>):
+    answer = llm.invoke(state[<span class="st">"retrieved_docs"</span>])
+    <span class="kw">return</span> {<span class="st">"answer"</span>: answer}
+
+graph = <span class="cl">StateGraph</span>(<span class="cl">State</span>)
+graph.add_node(<span class="st">"retrieve"</span>, retrieve)
+graph.add_node(<span class="st">"generate"</span>, generate)
+graph.add_edge(<span class="st">"retrieve"</span>, <span class="st">"generate"</span>)</pre>
+  </div>
+
+  <h2>Why State matters — 3 key reasons</h2>
+  <h3>1. Nodes are decoupled</h3>
+  <p>Nodes don't call each other — they just read/write state. This makes the graph modular and testable.</p>
+
+  <h3>2. Conditional routing uses state</h3>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">python</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div>
+    <pre><span class="kw">def</span> <span class="fn">should_continue</span>(state: <span class="cl">State</span>) -> str:
+    <span class="kw">if</span> state[<span class="st">"answer"</span>] == <span class="st">""</span>:
+        <span class="kw">return</span> <span class="st">"retry"</span>       <span class="cm"># go back and try again</span>
+    <span class="kw">return</span> <span class="st">"end"</span>             <span class="cm"># finish</span>
+
+graph.add_conditional_edges(<span class="st">"generate"</span>, should_continue)</pre>
+  </div>
+
+  <h3>3. State enables memory across turns</h3>
+  <p>In multi-turn agents, state persists the conversation history, tool results, and intermediate reasoning steps across the entire session.</p>
+
+  <h2>State vs Simple Variables</h2>
+  <table>
+    <tr><th></th><th>Regular Python variables</th><th>LangGraph State</th></tr>
+    <tr><td>Scope</td><td>Local to a function</td><td>Shared across all nodes</td></tr>
+    <tr><td>Persistence</td><td>Lost after function ends</td><td>Survives across node transitions</td></tr>
+    <tr><td>Routing</td><td>Can't drive graph flow</td><td>Can conditionally direct edges</td></tr>
+    <tr><td>Checkpointing</td><td>Not built-in</td><td>Can be saved/restored automatically</td></tr>
+  </table>
+
+  <div class="callout callout-info">
+    <strong>🧠 The Mental Model</strong>
+    If LangGraph is a workflow — <strong>Nodes</strong> are the workers doing tasks, <strong>Edges</strong> are the routes between workers, and <strong>State</strong> is the shared document everyone reads and writes as the work progresses. It's the central nervous system of your agent graph.
+  </div>
+
+  <div class="nav-btns">
+    <button class="btn btn-secondary" onclick="goto(11)">← Back</button>
     <button class="btn btn-primary" onclick="goto(0)" style="background:var(--accent2);color:#000;">↩ Start Over</button>
   </div>
 </div>
@@ -1109,6 +1359,7 @@ const lessons = document.querySelectorAll('.lesson');
 const navItems = document.querySelectorAll('.nav-item');
 let completed = new Set();
 let current = 0;
+const TOTAL = 13;
 
 function goto(idx) {
   lessons[current].classList.remove('active');
@@ -1123,8 +1374,8 @@ function goto(idx) {
   navItems[current].classList.remove('done');
   navItems[current].querySelector('.nav-dot').style.background = '';
 
-  document.getElementById('progressLabel').textContent = `${completed.size} / 10`;
-  document.getElementById('progressFill').style.width = (completed.size / 10 * 100) + '%';
+  document.getElementById('progressLabel').textContent = `${completed.size} / ${TOTAL}`;
+  document.getElementById('progressFill').style.width = (completed.size / TOTAL * 100) + '%';
 
   document.querySelector('main').scrollTo({ top: 0, behavior: 'smooth' });
 }
