@@ -307,6 +307,7 @@
   <div class="nav-item" onclick="goto(10)"><div class="nav-dot"></div>What is invoke()? <span class="chapter-badge">11</span></div>
   <div class="nav-item" onclick="goto(11)"><div class="nav-dot"></div>The | Pipe Chain <span class="chapter-badge">12</span></div>
   <div class="nav-item" onclick="goto(12)"><div class="nav-dot"></div>State in LangGraph <span class="chapter-badge">13</span></div>
+  <div class="nav-item" onclick="goto(13)"><div class="nav-dot"></div>Annotated &amp; Reducers <span class="chapter-badge">14</span></div>
 </aside>
 
 <main id="mainContent">
@@ -996,14 +997,14 @@ graph = builder.compile()
   <h2>Complete Agent Implementation</h2>
   <div class="code-block">
     <div class="code-header"><span class="code-lang">python</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div>
-    <pre><span class="kw">from</span> langgraph.graph <span class="kw">import</span> <span class="cl">StateGraph</span>, <span class="cl">START</span>, <span class="cl">END</span>
-<span class="kw">from</span> langgraph.prebuilt <span class="kw">import</span> <span class="cl">ToolNode</span>
-<span class="kw">from</span> langgraph.checkpoint.memory <span class="kw">import</span> <span class="cl">MemorySaver</span>
-<span class="kw">from</span> langchain_openai <span class="kw">import</span> <span class="cl">ChatOpenAI</span>
-<span class="kw">from</span> langchain_core.tools <span class="kw">import</span> tool
-<span class="kw">from</span> langchain_core.messages <span class="kw">import</span> <span class="cl">SystemMessage</span>
-<span class="kw">from</span> typing <span class="kw">import</span> <span class="cl">Annotated</span>, <span class="cl">TypedDict</span>
-<span class="kw">from</span> langgraph.graph.message <span class="kw">import</span> add_messages
+    <pre><span class="kw">from</span> langgraph.graph <span class="kw">import</span> <span class="cl">StateGraph</span>, <span class="cl">START</span>, <span class="cl">END</span>  <span class="cm"># Core graph builder + entry/exit sentinels</span>
+<span class="kw">from</span> langgraph.prebuilt <span class="kw">import</span> <span class="cl">ToolNode</span>              <span class="cm"># Pre-built node that automatically executes tool calls</span>
+<span class="kw">from</span> langgraph.checkpoint.memory <span class="kw">import</span> <span class="cl">MemorySaver</span>  <span class="cm"># In-memory checkpointer to persist conversation state across turns</span>
+<span class="kw">from</span> langchain_openai <span class="kw">import</span> <span class="cl">ChatOpenAI</span>              <span class="cm"># OpenAI LLM wrapper (GPT-4o, GPT-4, etc.)</span>
+<span class="kw">from</span> langchain_core.tools <span class="kw">import</span> tool               <span class="cm"># Decorator to turn any Python function into a LangChain tool</span>
+<span class="kw">from</span> langchain_core.messages <span class="kw">import</span> <span class="cl">SystemMessage</span>   <span class="cm"># Represents the system prompt message type</span>
+<span class="kw">from</span> typing <span class="kw">import</span> <span class="cl">Annotated</span>, <span class="cl">TypedDict</span>             <span class="cm"># Annotated: attach metadata to types | TypedDict: typed dict schema for State</span>
+<span class="kw">from</span> langgraph.graph.message <span class="kw">import</span> add_messages     <span class="cm"># Reducer: appends new messages instead of overwriting the list</span>
 
 <span class="cm"># ── 1. TOOLS ─────────────────────────────────</span>
 <span class="op">@</span><span class="fn">tool</span>
@@ -1347,6 +1348,189 @@ graph.add_conditional_edges(<span class="st">"generate"</span>, should_continue)
 
   <div class="nav-btns">
     <button class="btn btn-secondary" onclick="goto(11)">← Back</button>
+    <button class="btn btn-primary" onclick="goto(13)">Next: Annotated &amp; Reducers →</button>
+  </div>
+</div>
+
+<!-- LESSON 13: ANNOTATED + REDUCERS -->
+<div class="lesson" id="lesson-13">
+  <div class="lesson-tag tag-lg">Chapter 14 — Deep Dive</div>
+  <h1>Annotated, TypedDict &amp; Reducers</h1>
+  <p class="lesson-subtitle">Breaking down every word in <code>messages: Annotated[list, add_messages]</code> — from first principles.</p>
+
+  <h2>The full line, dissected</h2>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">python</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div>
+    <pre><span class="kw">class</span> <span class="cl">AgentState</span>(<span class="cl">TypedDict</span>):
+    messages: <span class="cl">Annotated</span>[list, add_messages]</pre>
+  </div>
+
+  <p>There are <strong>4 concepts</strong> in this one line. Let's unpack each one.</p>
+
+  <h2>1. TypedDict — a typed dictionary</h2>
+  <p><code>TypedDict</code> is a standard Python type from the <code>typing</code> module. It defines a dictionary with <strong>known keys and typed values</strong>. It's like a plain <code>dict</code>, but with type hints that tools (and LangGraph) can inspect.</p>
+
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">python</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div>
+    <pre><span class="kw">from</span> typing <span class="kw">import</span> <span class="cl">TypedDict</span>
+
+<span class="cm"># Without TypedDict — just a regular dict, no type safety</span>
+state = {<span class="st">"messages"</span>: [], <span class="st">"user"</span>: <span class="st">"Amir"</span>}
+
+<span class="cm"># With TypedDict — keys and value types are declared</span>
+<span class="kw">class</span> <span class="cl">AgentState</span>(<span class="cl">TypedDict</span>):
+    messages: list
+    user: str
+
+<span class="cm"># It still behaves like a dict at runtime:</span>
+s: <span class="cl">AgentState</span> = {<span class="st">"messages"</span>: [], <span class="st">"user"</span>: <span class="st">"Amir"</span>}
+<span class="fn">print</span>(s[<span class="st">"user"</span>])   <span class="cm"># → "Amir"</span>
+<span class="fn">print</span>(<span class="fn">type</span>(s))     <span class="cm"># → &lt;class 'dict'&gt;  (it IS a dict!)</span></pre>
+  </div>
+
+  <div class="callout callout-info">
+    <strong>🔑 Key Point</strong>
+    <code>TypedDict</code> is purely a <strong>type hint tool</strong> — it adds zero runtime overhead. At runtime it's just a plain Python dict. LangGraph uses the class definition to understand what fields exist in your state schema.
+  </div>
+
+  <h2>2. Annotated — attaching metadata to a type</h2>
+  <p><code>Annotated</code> is also from Python's <code>typing</code> module. It lets you attach <strong>extra metadata</strong> to a type hint — without changing the type itself.</p>
+
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">python</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div>
+    <pre><span class="kw">from</span> typing <span class="kw">import</span> <span class="cl">Annotated</span>
+
+<span class="cm"># Syntax: Annotated[actual_type, metadata1, metadata2, ...]</span>
+<span class="cm"># The type is still "list" — Annotated doesn't change that</span>
+
+x: <span class="cl">Annotated</span>[list, <span class="st">"some metadata"</span>]   <span class="cm"># x is still a list</span>
+y: <span class="cl">Annotated</span>[int, <span class="st">"must be positive"</span>]   <span class="cm"># y is still an int</span>
+
+<span class="cm"># Python itself ignores the metadata at runtime</span>
+<span class="cm"># But FRAMEWORKS (like LangGraph, Pydantic) can READ it</span></pre>
+  </div>
+
+  <p>Think of <code>Annotated[list, add_messages]</code> as saying: <em>"This is a <code>list</code>, AND here's an instruction for LangGraph about what to do when this field gets updated."</em></p>
+
+  <h2>3. The default problem — overwrite vs append</h2>
+  <p>Without <code>Annotated</code>, when a node returns an update, LangGraph simply <strong>overwrites</strong> the field:</p>
+
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">python</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div>
+    <pre><span class="cm"># State WITHOUT a reducer</span>
+<span class="kw">class</span> <span class="cl">BadState</span>(<span class="cl">TypedDict</span>):
+    messages: list   <span class="cm"># no Annotated — plain list</span>
+
+<span class="cm"># Node A sets messages to [msg1]</span>
+<span class="cm"># Node B returns {"messages": [msg2]}</span>
+<span class="cm"># Result: messages = [msg2]  ← msg1 is GONE! 💥</span>
+
+<span class="cm"># This is a disaster for chat history —</span>
+<span class="cm"># every node would wipe the previous messages</span></pre>
+  </div>
+
+  <h2>4. add_messages — the reducer function</h2>
+  <p><code>add_messages</code> is a <strong>reducer</strong> — a function that LangGraph calls to decide <em>how</em> to merge a node's returned value into the existing state field.</p>
+
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">python</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div>
+    <pre><span class="kw">from</span> langgraph.graph.message <span class="kw">import</span> add_messages
+
+<span class="cm"># What add_messages actually does (simplified):</span>
+<span class="kw">def</span> <span class="fn">add_messages</span>(existing: list, new: list) -> list:
+    <span class="kw">return</span> existing + new   <span class="cm"># append, don't overwrite</span>
+
+<span class="cm"># LangGraph calls it like this internally:</span>
+<span class="cm"># new_state["messages"] = add_messages(old_state["messages"], node_return["messages"])</span></pre>
+  </div>
+
+  <div class="diagram">
+<span class="label">Without reducer (overwrite):</span>
+<span class="node">state.messages = [HumanMsg("hi")]</span>
+  <span class="arrow">↓  node returns {"messages": [AIMsg("hello")]}</span>
+<span class="node">state.messages = [AIMsg("hello")]</span>  <span class="label">← history lost! 💥</span>
+
+<span class="label">With add_messages reducer (append):</span>
+<span class="node">state.messages = [HumanMsg("hi")]</span>
+  <span class="arrow">↓  node returns {"messages": [AIMsg("hello")]}</span>
+<span class="node">state.messages = [HumanMsg("hi"), AIMsg("hello")]</span>  <span class="label">← ✅ preserved</span>
+  </div>
+
+  <h2>Putting it all together</h2>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">python</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div>
+    <pre><span class="kw">from</span> typing <span class="kw">import</span> <span class="cl">Annotated</span>, <span class="cl">TypedDict</span>
+<span class="kw">from</span> langgraph.graph.message <span class="kw">import</span> add_messages
+
+<span class="kw">class</span> <span class="cl">AgentState</span>(<span class="cl">TypedDict</span>):
+    <span class="cm"># "messages is a list, and use add_messages to update it"</span>
+    messages: <span class="cl">Annotated</span>[list, add_messages]
+    
+    <span class="cm"># These use default overwrite behavior (no reducer needed)</span>
+    user_intent: str
+    is_done: bool
+
+<span class="cm"># Node just returns the NEW message(s) — not the full history</span>
+<span class="kw">def</span> <span class="fn">chat_node</span>(state: <span class="cl">AgentState</span>):
+    response = llm.invoke(state[<span class="st">"messages"</span>])
+    <span class="kw">return</span> {<span class="st">"messages"</span>: [response]}  <span class="cm"># ← only new msg; reducer appends it</span>
+
+<span class="cm"># After 3 turns the state looks like:</span>
+<span class="cm"># state["messages"] = [</span>
+<span class="cm">#   HumanMessage("hi"),</span>
+<span class="cm">#   AIMessage("hello!"),</span>
+<span class="cm">#   HumanMessage("what's 2+2?"),</span>
+<span class="cm">#   AIMessage("It's 4."),</span>
+<span class="cm">#   HumanMessage("thanks"),</span>
+<span class="cm">#   AIMessage("You're welcome!"),</span>
+<span class="cm"># ]</span></pre>
+  </div>
+
+  <h2>add_messages also deduplicates</h2>
+  <p>The real <code>add_messages</code> from LangGraph is smarter than a simple append — it also handles <strong>message ID deduplication</strong>. If a message with the same ID is returned, it <em>replaces</em> the old one instead of duplicating it. This is useful for tool result updates.</p>
+
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">python</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div>
+    <pre><span class="kw">from</span> langchain_core.messages <span class="kw">import</span> <span class="cl">HumanMessage</span>, <span class="cl">AIMessage</span>
+
+existing = [<span class="cl">HumanMessage</span>(content=<span class="st">"hi"</span>, id=<span class="st">"msg-1"</span>)]
+new      = [<span class="cl">AIMessage</span>(content=<span class="st">"hello"</span>, id=<span class="st">"msg-2"</span>)]
+
+result = add_messages(existing, new)
+<span class="cm"># → [HumanMessage("hi"), AIMessage("hello")]  ← appended ✅</span>
+
+<span class="cm"># If IDs match — it REPLACES instead of appending:</span>
+update = [<span class="cl">HumanMessage</span>(content=<span class="st">"hey"</span>, id=<span class="st">"msg-1"</span>)]
+result2 = add_messages(existing, update)
+<span class="cm"># → [HumanMessage("hey")]  ← replaced, not duplicated ✅</span></pre>
+  </div>
+
+  <h2>Writing your own reducer</h2>
+  <p>You're not limited to <code>add_messages</code>. Any function with signature <code>(existing, new) → merged</code> works as a reducer:</p>
+
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">python</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div>
+    <pre><span class="cm"># Custom reducer: keep only the last 10 messages (sliding window)</span>
+<span class="kw">def</span> <span class="fn">keep_last_10</span>(existing: list, new: list) -> list:
+    combined = existing + new
+    <span class="kw">return</span> combined[-<span class="num">10</span>:]   <span class="cm"># trim to last 10</span>
+
+<span class="cm"># Custom reducer: increment a counter</span>
+<span class="kw">def</span> <span class="fn">increment</span>(existing: int, new: int) -> int:
+    <span class="kw">return</span> existing + new
+
+<span class="kw">class</span> <span class="cl">MyState</span>(<span class="cl">TypedDict</span>):
+    messages: <span class="cl">Annotated</span>[list, keep_last_10]   <span class="cm"># sliding window</span>
+    tool_call_count: <span class="cl">Annotated</span>[int, increment]  <span class="cm"># accumulating counter</span></pre>
+  </div>
+
+  <div class="callout callout-tip">
+    <strong>✅ Rule of thumb</strong>
+    Use <code>Annotated[list, add_messages]</code> for any field that <strong>accumulates</strong> over time (chat history, tool results, log entries). Use plain types (no <code>Annotated</code>) for fields that should simply be <strong>replaced</strong> (current intent, a flag, a score).
+  </div>
+
+  <div class="nav-btns">
+    <button class="btn btn-secondary" onclick="goto(12)">← Back</button>
     <button class="btn btn-primary" onclick="goto(0)" style="background:var(--accent2);color:#000;">↩ Start Over</button>
   </div>
 </div>
@@ -1359,7 +1543,7 @@ const lessons = document.querySelectorAll('.lesson');
 const navItems = document.querySelectorAll('.nav-item');
 let completed = new Set();
 let current = 0;
-const TOTAL = 13;
+const TOTAL = 14;
 
 function goto(idx) {
   lessons[current].classList.remove('active');
