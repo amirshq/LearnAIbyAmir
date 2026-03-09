@@ -1412,30 +1412,99 @@ Our team will respond within 24 hours."</span>
     </div>
 
     <h2>Generative Answers Architecture</h2>
-    <div class="arch-diagram">
-<span class="hl">USER MESSAGE</span>
-       │
-       ▼
-<span class="box">┌─────────────────────────────────────────────────┐</span>
-<span class="box">│         INTENT ROUTING                          │</span>
-<span class="box">│                                                 │</span>
-<span class="box">│  Topic match found?                             │</span>
-<span class="box">│       YES → Execute Topic                       │</span>
-<span class="box">│       NO  → Check Knowledge Sources             │</span>
-<span class="box">└─────────────────┬───────────────────────────────┘</span>
-                  │
-                  ▼
-<span class="box">┌─────────────────────────────────────────────────┐</span>
-<span class="box">│         GENERATIVE ANSWERS ENGINE               │</span>
-<span class="box">│                                                 │</span>
-<span class="box">│  1. Semantic Search across knowledge sources    │</span>
-<span class="box">│  2. Retrieve relevant chunks                    │</span>
-<span class="box">│  3. Send to Azure OpenAI (GPT) with context     │</span>
-<span class="box">│  4. Return grounded answer + citation           │</span>
-<span class="box">└─────────────────────────────────────────────────┘</span>
-                  │
-                  ▼
-<span class="hl">BOT RESPONSE</span> (with source citation)
+    <div style="background:#0d1117; border:1px solid #1e2640; border-radius:12px; padding:28px 24px; margin:16px 0; overflow-x:auto;">
+      <svg viewBox="0 0 580 480" xmlns="http://www.w3.org/2000/svg" style="width:100%; max-width:580px; display:block; margin:0 auto;" font-family="'Syne', sans-serif">
+        <defs>
+          <marker id="arrowG" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L0,6 L8,3 z" fill="#f59e0b"/>
+          </marker>
+          <marker id="arrowGreen" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L0,6 L8,3 z" fill="#10b981"/>
+          </marker>
+          <marker id="arrowBlue" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L0,6 L8,3 z" fill="#3b82f6"/>
+          </marker>
+        </defs>
+
+        <!-- USER MESSAGE -->
+        <rect x="165" y="8" width="250" height="44" rx="10" fill="#1e293b" stroke="#3b82f6" stroke-width="1.5"/>
+        <text x="290" y="27" text-anchor="middle" fill="#3b82f6" font-size="11" font-weight="700" letter-spacing="1">USER MESSAGE</text>
+        <text x="290" y="43" text-anchor="middle" fill="#94a3b8" font-size="10">"How many days off do I get?"</text>
+
+        <!-- Arrow down -->
+        <line x1="290" y1="52" x2="290" y2="76" stroke="#f59e0b" stroke-width="2" marker-end="url(#arrowG)"/>
+
+        <!-- INTENT ROUTING box -->
+        <rect x="60" y="80" width="460" height="100" rx="12" fill="#111827" stroke="#8b5cf6" stroke-width="1.5"/>
+        <text x="290" y="101" text-anchor="middle" fill="#a78bfa" font-size="12" font-weight="800" letter-spacing="1.5">INTENT ROUTING</text>
+        <!-- divider -->
+        <line x1="290" y1="110" x2="290" y2="172" stroke="#1e2640" stroke-width="1"/>
+        <!-- YES branch label -->
+        <text x="175" y="127" text-anchor="middle" fill="#10b981" font-size="11" font-weight="700">✓ Topic Match Found</text>
+        <text x="175" y="144" text-anchor="middle" fill="#64748b" font-size="10">NLU confidence above threshold</text>
+        <rect x="100" y="153" width="150" height="22" rx="6" fill="#064e3b" stroke="#10b981" stroke-width="1"/>
+        <text x="175" y="168" text-anchor="middle" fill="#6ee7b7" font-size="10" font-weight="700">→ Execute Authored Topic</text>
+        <!-- NO branch label -->
+        <text x="405" y="127" text-anchor="middle" fill="#f59e0b" font-size="11" font-weight="700">✗ No Topic Match</text>
+        <text x="405" y="144" text-anchor="middle" fill="#64748b" font-size="10">Falls through to knowledge layer</text>
+        <rect x="330" y="153" width="160" height="22" rx="6" fill="#1c1917" stroke="#f59e0b" stroke-width="1"/>
+        <text x="410" y="168" text-anchor="middle" fill="#fcd34d" font-size="10" font-weight="700">→ Check Knowledge Sources</text>
+
+        <!-- Arrow from NO path down -->
+        <line x1="410" y1="180" x2="410" y2="204" stroke="#f59e0b" stroke-width="2"/>
+        <line x1="410" y1="204" x2="290" y2="204" stroke="#f59e0b" stroke-width="2"/>
+        <line x1="290" y1="204" x2="290" y2="218" stroke="#f59e0b" stroke-width="2" marker-end="url(#arrowG)"/>
+
+        <!-- GENERATIVE ANSWERS ENGINE box -->
+        <rect x="60" y="222" width="460" height="148" rx="12" fill="#111827" stroke="#06b6d4" stroke-width="1.5"/>
+        <text x="290" y="243" text-anchor="middle" fill="#67e8f9" font-size="12" font-weight="800" letter-spacing="1.5">GENERATIVE ANSWERS ENGINE</text>
+
+        <!-- Step 1 -->
+        <rect x="80" y="252" width="200" height="34" rx="8" fill="#0c2233" stroke="#06b6d4" stroke-width="1"/>
+        <text x="88" y="267" fill="#06b6d4" font-size="10" font-weight="700">① Semantic Search</text>
+        <text x="88" y="280" fill="#64748b" font-size="9">Query vectors across knowledge sources</text>
+
+        <!-- Step 2 -->
+        <rect x="300" y="252" width="200" height="34" rx="8" fill="#0c2233" stroke="#06b6d4" stroke-width="1"/>
+        <text x="308" y="267" fill="#06b6d4" font-size="10" font-weight="700">② Retrieve Chunks</text>
+        <text x="308" y="280" fill="#64748b" font-size="9">Top-K relevant document segments</text>
+
+        <!-- Step 3 -->
+        <rect x="80" y="296" width="200" height="34" rx="8" fill="#0c2233" stroke="#8b5cf6" stroke-width="1"/>
+        <text x="88" y="311" fill="#a78bfa" font-size="10" font-weight="700">③ Send to Azure OpenAI</text>
+        <text x="88" y="324" fill="#64748b" font-size="9">Prompt = query + retrieved context</text>
+
+        <!-- Step 4 -->
+        <rect x="300" y="296" width="200" height="34" rx="8" fill="#0c2233" stroke="#8b5cf6" stroke-width="1"/>
+        <text x="308" y="311" fill="#a78bfa" font-size="10" font-weight="700">④ Grounded Response</text>
+        <text x="308" y="324" fill="#64748b" font-size="9">GPT answers only from context</text>
+
+        <!-- Arrow between steps 1→2 -->
+        <line x1="280" y1="269" x2="300" y2="269" stroke="#f59e0b" stroke-width="1.5" marker-end="url(#arrowG)"/>
+        <!-- Arrow step 2→3 (diagonal) -->
+        <line x1="400" y1="286" x2="400" y2="292" stroke="#f59e0b" stroke-width="1.5"/>
+        <line x1="400" y1="292" x2="280" y2="296" stroke="#f59e0b" stroke-width="1.5" marker-end="url(#arrowG)"/>
+        <!-- Arrow step 3→4 -->
+        <line x1="280" y1="313" x2="300" y2="313" stroke="#f59e0b" stroke-width="1.5" marker-end="url(#arrowG)"/>
+
+        <!-- Arrow out of engine -->
+        <line x1="290" y1="370" x2="290" y2="394" stroke="#f59e0b" stroke-width="2" marker-end="url(#arrowG)"/>
+
+        <!-- BOT RESPONSE box -->
+        <rect x="130" y="398" width="320" height="58" rx="12" fill="#1e2640" stroke="#10b981" stroke-width="1.5"/>
+        <text x="290" y="420" text-anchor="middle" fill="#6ee7b7" font-size="12" font-weight="800" letter-spacing="1">BOT RESPONSE</text>
+        <text x="290" y="437" text-anchor="middle" fill="#64748b" font-size="10">Generated answer · Source citation · Confidence indicator</text>
+        <text x="290" y="450" text-anchor="middle" fill="#374151" font-size="9">"According to the Employee Handbook (p.12), you receive 20 days."</text>
+
+        <!-- Knowledge sources label on side -->
+        <rect x="8" y="290" width="46" height="62" rx="8" fill="#1e2640" stroke="#f59e0b" stroke-width="1"/>
+        <text x="31" y="307" text-anchor="middle" fill="#fcd34d" font-size="8" font-weight="700">KNOW-</text>
+        <text x="31" y="319" text-anchor="middle" fill="#fcd34d" font-size="8" font-weight="700">LEDGE</text>
+        <text x="31" y="333" text-anchor="middle" fill="#64748b" font-size="7">PDF</text>
+        <text x="31" y="343" text-anchor="middle" fill="#64748b" font-size="7">SharePoint</text>
+        <text x="31" y="353" text-anchor="middle" fill="#64748b" font-size="7">Web URLs</text>
+        <line x1="54" y1="321" x2="80" y2="269" stroke="#f59e0b" stroke-width="1" stroke-dasharray="3,2" marker-end="url(#arrowG)"/>
+      </svg>
     </div>
 
     <h2>Generative Answers Inside a Topic</h2>
