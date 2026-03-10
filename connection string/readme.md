@@ -7,4 +7,6 @@
 - **Messaging & Cache**: RabbitMQ, Kafka, NATS, Redis, Memcached.
 - **Network & Auth**: FTP/SFTP, SMTP/IMAP, LDAP/AD, WebSocket, API keys, OAuth2/JWT, plus security best practices.
 
-Open `connectionstring.html` in your browser to browse categories, copy examples, and view tips/warnings.*** End Patch``` ***!
+Open `connectionstring.html` in your browser to browse categories, copy examples, and view tips/warnings.
+
+You can also access the online version at [`https://amirshq.github.io/LearnAIbyAmir/`](https://amirshq.github.io/LearnAIbyAmir/).*** End Patch``` ***!
