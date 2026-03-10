@@ -28,6 +28,37 @@
     overflow-x: hidden;
   }
 
+  .back-pill {
+    position: fixed;
+    z-index: 9999;
+    top: 12px;
+    left: 12px;
+    padding: 6px 12px;
+    border-radius: 999px;
+    background: rgba(15,23,42,0.96);
+    border: 1px solid rgba(148,163,255,0.6);
+    color: #e5e7eb;
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    backdrop-filter: blur(14px);
+  }
+
+  .back-pill span {
+    font-size: 14px;
+  }
+
+  @media (min-width: 768px) {
+    .back-pill {
+      top: 16px;
+      left: 18px;
+    }
+  }
+
   /* LAYOUT */
   .layout { display: flex; min-height: 100vh; }
 
@@ -438,6 +469,9 @@
 </style>
 </head>
 <body>
+  <button class="back-pill" onclick="(history.length > 1 ? history.back() : window.location.href = '../index.html')">
+    <span>←</span> Back to topics
+  </button>
 
 <div class="layout">
   <!-- SIDEBAR -->
