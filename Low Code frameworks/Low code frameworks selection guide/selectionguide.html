@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Low-code Cheat Sheet and Selection Guide</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #13131a;
+    --surface2: #1c1c27;
+    --border: #2a2a3d;
+    --accent: #7c6af7;
+    --accent2: #e85d9a;
+    --accent3: #3dd6c8;
+    --text: #e8e8f0;
+    --muted: #7070a0;
+    --lex: #f59e0b;
+    --copilot: #3b82f6;
+    --dialogflow: #22c55e;
+    --langchain: #a855f7;
+    --autogen: #ef4444;
+    --crewai: #14b8a6;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Syne', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Grid noise background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(124,106,247,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(124,106,247,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .wrapper { position: relative; z-index: 1; max-width: 1600px; margin: 0 auto; padding: 0 24px 60px; }
+
+  /* Header */
+  header {
+    padding: 52px 0 40px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 40px;
+  }
+
+  .header-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    margin-bottom: 12px;
+    display: block;
+  }
+
+  h1 {
+    font-size: clamp(28px, 4vw, 52px);
+    font-weight: 800;
+    line-height: 1.05;
+    background: linear-gradient(135deg, #fff 0%, var(--accent) 60%, var(--accent2) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 14px;
+  }
+
+  .subtitle {
+    color: var(--muted);
+    font-size: 15px;
+    font-weight: 400;
+    max-width: 600px;
+    line-height: 1.6;
+  }
+
+  /* Framework legend */
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 36px;
+    align-items: center;
+  }
+
+  .legend-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-right: 6px;
+  }
+
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    border: 1px solid;
+    cursor: default;
+  }
+
+  .pill-dot { width: 7px; height: 7px; border-radius: 50%; }
+
+  /* Filter bar */
+  .filter-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 28px;
+    align-items: center;
+  }
+
+  .filter-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-right: 4px;
+  }
+
+  .filter-btn {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    padding: 5px 14px;
+    border-radius: 4px;
+    font-family: 'Syne', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+    letter-spacing: 0.5px;
+  }
+
+  .filter-btn:hover { border-color: var(--accent); color: var(--text); }
+  .filter-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+  /* Table container */
+  .table-scroll {
+    overflow-x: auto;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 1100px;
+  }
+
+  /* Column headers */
+  thead tr th {
+    padding: 16px 18px;
+    text-align: left;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    background: var(--surface2);
+    border-bottom: 2px solid var(--border);
+    white-space: nowrap;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+
+  th:first-child { color: var(--muted); min-width: 160px; }
+
+  th.col-lex { color: var(--lex); border-top: 3px solid var(--lex); }
+  th.col-copilot { color: var(--copilot); border-top: 3px solid var(--copilot); }
+  th.col-dialogflow { color: var(--dialogflow); border-top: 3px solid var(--dialogflow); }
+  th.col-langchain { color: var(--langchain); border-top: 3px solid var(--langchain); }
+  th.col-autogen { color: var(--autogen); border-top: 3px solid var(--autogen); }
+  th.col-crewai { color: var(--crewai); border-top: 3px solid var(--crewai); }
+
+  /* Row groups */
+  tbody tr {
+    border-bottom: 1px solid var(--border);
+    transition: background 0.12s;
+  }
+
+  tbody tr:hover { background: rgba(124, 106, 247, 0.04); }
+  tbody tr.hidden { display: none; }
+
+  td {
+    padding: 14px 18px;
+    vertical-align: top;
+    font-size: 13.5px;
+    line-height: 1.5;
+  }
+
+  /* Concept column */
+  .concept-cell {
+    min-width: 200px;
+  }
+
+  .concept-name {
+    font-weight: 700;
+    font-size: 14px;
+    color: var(--text);
+    margin-bottom: 5px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .concept-icon {
+    width: 24px;
+    height: 24px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    flex-shrink: 0;
+  }
+
+  .concept-def {
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.55;
+    font-weight: 400;
+  }
+
+  .concept-example {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10.5px;
+    color: var(--accent3);
+    margin-top: 6px;
+    background: rgba(61, 214, 200, 0.06);
+    padding: 4px 8px;
+    border-radius: 4px;
+    border-left: 2px solid var(--accent3);
+    line-height: 1.5;
+  }
+
+  /* Term cells */
+  .term-cell { min-width: 150px; }
+
+  .term-name {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12.5px;
+    font-weight: 500;
+    padding: 3px 8px;
+    border-radius: 4px;
+    display: inline-block;
+    margin-bottom: 4px;
+  }
+
+  .term-note {
+    font-size: 11.5px;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+
+  .term-na {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: #3a3a55;
+  }
+
+  /* Category divider */
+  tr.category-row td {
+    background: var(--surface2);
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    color: var(--accent);
+    padding: 8px 18px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  /* Colors per framework */
+  .lex-term { background: rgba(245,158,11,0.12); color: var(--lex); }
+  .copilot-term { background: rgba(59,130,246,0.12); color: var(--copilot); }
+  .dialogflow-term { background: rgba(34,197,94,0.12); color: var(--dialogflow); }
+  .langchain-term { background: rgba(168,85,247,0.12); color: var(--langchain); }
+  .autogen-term { background: rgba(239,68,68,0.12); color: var(--autogen); }
+  .crewai-term { background: rgba(20,184,166,0.12); color: var(--crewai); }
+
+  .concept-bg-nlp { background: rgba(124,106,247,0.06); }
+  .concept-bg-agent { background: rgba(232,93,154,0.06); }
+  .concept-bg-memory { background: rgba(61,214,200,0.06); }
+  .concept-bg-flow { background: rgba(245,158,11,0.06); }
+
+  /* Stats bar */
+  .stats {
+    display: flex;
+    gap: 24px;
+    margin-bottom: 32px;
+    flex-wrap: wrap;
+  }
+
+  .stat {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .stat-num {
+    font-size: 24px;
+    font-weight: 800;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .stat-label {
+    font-size: 11px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+  }
+</style>
+</head>
+<body>
+<div class="wrapper">
+  <header>
+    <span class="header-tag">// Cross-Framework Reference</span>
+    <h1>Low-code Cheat Sheet<br>and Selection Guide</h1>
+    <p class="subtitle">Same concept, different names. Every major term mapped across Amazon Lex, Copilot Studio, Dialogflow CX, LangChain/LangGraph, AutoGen v0.4, and CrewAI.</p>
+  </header>
+
+  <div class="stats">
+    <div class="stat"><span class="stat-num">6</span><span class="stat-label">Frameworks</span></div>
+    <div class="stat"><span class="stat-num">20</span><span class="stat-label">Core Concepts</span></div>
+    <div class="stat"><span class="stat-num">4</span><span class="stat-label">Concept Groups</span></div>
+  </div>
+
+  <div class="legend">
+    <span class="legend-label">Frameworks:</span>
+    <span class="pill" style="color:var(--lex);border-color:rgba(245,158,11,0.3);background:rgba(245,158,11,0.08)"><span class="pill-dot" style="background:var(--lex)"></span>Amazon Lex</span>
+    <span class="pill" style="color:var(--copilot);border-color:rgba(59,130,246,0.3);background:rgba(59,130,246,0.08)"><span class="pill-dot" style="background:var(--copilot)"></span>Copilot Studio</span>
+    <span class="pill" style="color:var(--dialogflow);border-color:rgba(34,197,94,0.3);background:rgba(34,197,94,0.08)"><span class="pill-dot" style="background:var(--dialogflow)"></span>Dialogflow CX</span>
+    <span class="pill" style="color:var(--langchain);border-color:rgba(168,85,247,0.3);background:rgba(168,85,247,0.08)"><span class="pill-dot" style="background:var(--langchain)"></span>LangChain / LangGraph</span>
+    <span class="pill" style="color:var(--autogen);border-color:rgba(239,68,68,0.3);background:rgba(239,68,68,0.08)"><span class="pill-dot" style="background:var(--autogen)"></span>AutoGen v0.4</span>
+    <span class="pill" style="color:var(--crewai);border-color:rgba(20,184,166,0.3);background:rgba(20,184,166,0.08)"><span class="pill-dot" style="background:var(--crewai)"></span>CrewAI</span>
+  </div>
+
+  <div class="filter-bar">
+    <span class="filter-label">Filter:</span>
+    <button class="filter-btn active" onclick="filterRows('all', this)">All</button>
+    <button class="filter-btn" onclick="filterRows('nlp', this)">🗣 NLP / Intent</button>
+    <button class="filter-btn" onclick="filterRows('agent', this)">🤖 Agent / Execution</button>
+    <button class="filter-btn" onclick="filterRows('memory', this)">🧠 Memory / State</button>
+    <button class="filter-btn" onclick="filterRows('flow', this)">🔀 Flow / Orchestration</button>
+  </div>
+
+  <div class="table-scroll">
+    <table id="mainTable">
+      <thead>
+        <tr>
+          <th>Universal Concept</th>
+          <th class="col-lex">Amazon Lex</th>
+          <th class="col-copilot">Copilot Studio</th>
+          <th class="col-dialogflow">Dialogflow CX</th>
+          <th class="col-langchain">LangChain / LangGraph</th>
+          <th class="col-autogen">AutoGen v0.4</th>
+          <th class="col-crewai">CrewAI</th>
+        </tr>
+      </thead>
+      <tbody>
+
+        <!-- ─── NLP / INTENT ─── -->
+        <tr class="category-row"><td colspan="7">🗣 NLP / Intent Recognition</td></tr>
+
+        <tr data-group="nlp">
+          <td class="concept-cell">
+            <div class="concept-name"><span class="concept-icon" style="background:rgba(124,106,247,0.15)">🎯</span>Intent</div>
+            <div class="concept-def">A named goal or action the user wants to accomplish. The top-level classification of what the user is trying to do.</div>
+            <div class="concept-example">"BookFlight", "CheckBalance", "CancelOrder"</div>
+          </td>
+          <td class="term-cell"><span class="term-name lex-term">Intent</span><div class="term-note">Core unit; every bot is a collection of intents.</div></td>
+          <td class="term-cell"><span class="term-name copilot-term">Topic</span><div class="term-note">A topic contains trigger phrases and the conversation path for one user goal.</div></td>
+          <td class="term-cell"><span class="term-name dialogflow-term">Intent</span><div class="term-note">Same concept; matched via ML classifier or exact phrases.</div></td>
+          <td class="term-cell"><span class="term-name langchain-term">Tool / Chain</span><div class="term-note">No formal "intent"; routing is done by the LLM selecting a tool or chain to invoke.</div></td>
+          <td class="term-cell"><span class="term-name autogen-term">—</span><div class="term-note">No explicit intent layer; the LLM interprets user messages directly and routes to agents.</div></td>
+          <td class="term-cell"><span class="term-name crewai-term">Task</span><div class="term-note">Closest analog; a task defines what an agent should accomplish.</div></td>
+        </tr>
+
+        <tr data-group="nlp">
+          <td class="concept-cell">
+            <div class="concept-name"><span class="concept-icon" style="background:rgba(124,106,247,0.15)">💬</span>Utterances / Training Phrases</div>
+            <div class="concept-def">Sample phrases users might say to trigger an intent. Used to train the NLU classifier.</div>
+            <div class="concept-example">"I want a pizza", "Order me a large margherita", "Get me food"</div>
+          </td>
+          <td class="term-cell"><span class="term-name lex-term">Utterances</span><div class="term-note">Listed per intent; Lex uses them to train its ML model.</div></td>
+          <td class="term-cell"><span class="term-name copilot-term">Trigger Phrases</span><div class="term-note">Phrases added to a topic that cause it to activate.</div></td>
+          <td class="term-cell"><span class="term-name dialogflow-term">Training Phrases</span><div class="term-note">Added per intent; annotated with entity tags for extraction.</div></td>
+          <td class="term-cell"><span class="term-name langchain-term">Prompt / System Prompt</span><div class="term-note">No training phrases; the LLM itself handles NLU. Routing is instruction-based.</div></td>
+          <td class="term-cell"><span class="term-name autogen-term">—</span><div class="term-note">Not applicable; LLM handles all NLU natively from the conversation.</div></td>
+          <td class="term-cell"><span class="term-name crewai-term">Task Description</span><div class="term-note">Natural language description of what the task is; the LLM interprets it directly.</div></td>
+        </tr>
+
+        <tr data-group="nlp">
+          <td class="concept-cell">
+            <div class="concept-name"><span class="concept-icon" style="background:rgba(124,106,247,0.15)">🏷</span>Entity / Slot</div>
+            <div class="concept-def">A typed variable extracted from user input — a piece of information needed to fulfill the intent.</div>
+            <div class="concept-example">City = "Montreal", Date = "tomorrow", Size = "large"</div>
+          </td>
+          <td class="term-cell"><span class="term-name lex-term">Slot</span><div class="term-note">Typed data points Lex extracts. Each intent has a slot list.</div></td>
+          <td class="term-cell"><span class="term-name copilot-term">Variable / Entity</span><div class="term-note">Variables store extracted values; entities define the type (e.g. city, date).</div></td>
+          <td class="term-cell"><span class="term-name dialogflow-term">Entity / Parameter</span><div class="term-note">Entities define types; parameters are per-intent instances of those types.</div></td>
+          <td class="term-cell"><span class="term-name langchain-term">Tool Input Schema (Pydantic)</span><div class="term-note">Tool arguments defined via Pydantic BaseModel. LLM fills them from conversation.</div></td>
+          <td class="term-cell"><span class="term-name autogen-term">Function Parameter</span><div class="term-note">Tool/function call arguments extracted by the LLM when invoking a registered function.</div></td>
+          <td class="term-cell"><span class="term-name crewai-term">Task Input / Context</span><div class="term-note">Passed as structured context when a task is created. No formal slot-filling loop.</div></td>
+        </tr>
+
+        <tr data-group="nlp">
+          <td class="concept-cell">
+            <div class="concept-name"><span class="concept-icon" style="background:rgba(124,106,247,0.15)">🔁</span>Slot Filling / Elicitation</div>
+            <div class="concept-def">The multi-turn loop where the bot asks follow-up questions to collect all required slots before fulfillment.</div>
+            <div class="concept-example">Bot: "What city?" → User: "Paris" → Bot: "What date?"</div>
+          </td>
+          <td class="term-cell"><span class="term-name lex-term">Slot Elicitation</span><div class="term-note">Built-in; Lex auto-prompts for missing slots using configured prompts.</div></td>
+          <td class="term-cell"><span class="term-name copilot-term">Question Nodes</span><div class="term-note">Explicit Ask-a-Question nodes in the topic canvas collect variable values.</div></td>
+          <td class="term-cell"><span class="term-name dialogflow-term">Form / Parameter Filling</span><div class="term-note">CX Form nodes collect all parameters before moving to the next page.</div></td>
+          <td class="term-cell"><span class="term-name langchain-term">Multi-turn Chain / Human-in-the-loop</span><div class="term-note">Managed manually or via LangGraph interrupt nodes with state checkpoints.</div></td>
+          <td class="term-cell"><span class="term-name autogen-term">Multi-agent Turn / Human Proxy</span><div class="term-note">UserProxyAgent simulates a user turn; missing info is requested via follow-up messages.</div></td>
+          <td class="term-cell"><span class="term-name crewai-term">—</span><div class="term-note">No built-in slot filling; handled via custom agent logic or human input callbacks.</div></td>
+        </tr>
+
+        <tr data-group="nlp">
+          <td class="concept-cell">
+            <div class="concept-name"><span class="concept-icon" style="background:rgba(124,106,247,0.15)">🎲</span>Confidence Score / Fallback</div>
+            <div class="concept-def">A score indicating how certain the NLU model is about its intent match. Below a threshold, a fallback/default intent fires.</div>
+            <div class="concept-example">Confidence: 0.43 → triggers FallbackIntent</div>
+          </td>
+          <td class="term-cell"><span class="term-name lex-term">AMAZON.FallbackIntent</span><div class="term-note">Special built-in intent fired when no other intent meets the confidence threshold.</div></td>
+          <td class="term-cell"><span class="term-name copilot-term">Fallback Topic / Escalate</span><div class="term-note">"Fallback" system topic; can escalate to human agent.</div></td>
+          <td class="term-cell"><span class="term-name dialogflow-term">Default Fallback Intent</span><div class="term-note">Fires when NLU confidence is below threshold; configurable per flow.</div></td>
+          <td class="term-cell"><span class="term-name langchain-term">Default Tool / Catch-all Prompt</span><div class="term-note">No native concept; handled by prompt design or a default routing branch.</div></td>
+          <td class="term-cell"><span class="term-name autogen-term">—</span><div class="term-note">LLM responds naturally even to ambiguous input; no explicit fallback mechanism.</div></td>
+          <td class="term-cell"><span class="term-name crewai-term">—</span><div class="term-note">Not applicable; task routing is LLM-driven.</div></td>
+        </tr>
+
+        <!-- ─── AGENT / EXECUTION ─── -->
+        <tr class="category-row"><td colspan="7">🤖 Agent / Execution</td></tr>
+
+        <tr data-group="agent">
+          <td class="concept-cell">
+            <div class="concept-name"><span class="concept-icon" style="background:rgba(232,93,154,0.15)">🤖</span>Agent / Bot</div>
+            <div class="concept-def">The top-level autonomous entity that perceives input, reasons, and takes actions or generates responses.</div>
+            <div class="concept-example">CustomerSupportBot, ResearchAgent, SalesAgent</div>
+          </td>
+          <td class="term-cell"><span class="term-name lex-term">Bot</span><div class="term-note">The Lex bot; contains all intents, slot types, and locales.</div></td>
+          <td class="term-cell"><span class="term-name copilot-term">Copilot / Agent</span><div class="term-note">The published Copilot; wraps all topics and knowledge sources.</div></td>
+          <td class="term-cell"><span class="term-name dialogflow-term">Agent</span><div class="term-note">A Dialogflow CX agent; contains all flows, intents, and entity types.</div></td>
+          <td class="term-cell"><span class="term-name langchain-term">Agent</span><div class="term-note">AgentExecutor or LangGraph graph node that reasons + calls tools in a loop.</div></td>
+          <td class="term-cell"><span class="term-name autogen-term">Agent (AssistantAgent)</span><div class="term-note">ConversableAgent subclass. AssistantAgent is the LLM-powered agent role.</div></td>
+          <td class="term-cell"><span class="term-name crewai-term">Agent</span><div class="term-note">Defined with role, goal, backstory, and tools. The atomic worker unit.</div></td>
+        </tr>
+
+        <tr data-group="agent">
+          <td class="concept-cell">
+            <div class="concept-name"><span class="concept-icon" style="background:rgba(232,93,154,0.15)">🔧</span>Tool / Action / Function</div>
+            <div class="concept-def">A callable function the agent can invoke to interact with the outside world — APIs, DBs, code executors, etc.</div>
+            <div class="concept-example">search_web(), query_db(), send_email(), run_code()</div>
+          </td>
+          <td class="term-cell"><span class="term-name lex-term">Lambda Hook (Fulfillment)</span><div class="term-note">AWS Lambda function triggered on slot capture or intent fulfillment.</div></td>
+          <td class="term-cell"><span class="term-name copilot-term">Action / Power Automate Flow</span><div class="term-note">HTTP calls or Power Automate flows triggered within a topic.</div></td>
+          <td class="term-cell"><span class="term-name dialogflow-term">Webhook / Fulfillment</span><div class="term-note">HTTP webhook called when an intent or page fires; returns dynamic responses.</div></td>
+          <td class="term-cell"><span class="term-name langchain-term">Tool (@tool decorator)</span><div class="term-note">Python function wrapped with @tool. LLM selects and calls it via function calling.</div></td>
+          <td class="term-cell"><span class="term-name autogen-term">Tool / Registered Function</span><div class="term-note">Functions registered on agents; LLM invokes via OpenAI-style function calling.</div></td>
+          <td class="term-cell"><span class="term-name crewai-term">Tool</span><div class="term-note">BaseTool subclass or @tool-decorated function assigned to an agent.</div></td>
+        </tr>
+
+        <tr data-group="agent">
+          <td class="concept-cell">
+            <div class="concept-name"><span class="concept-icon" style="background:rgba(232,93,154,0.15)">👤</span>Human Proxy / User Simulator</div>
+            <div class="concept-def">A component that stands in for a human user in automated or multi-agent pipelines — handles input/output on behalf of a person.</div>
+            <div class="concept-example">Testing pipelines, auto-feedback loops, HITL approval</div>
+          </td>
+          <td class="term-cell"><span class="term-name lex-term">—</span><div class="term-note">Not applicable; Lex is always user-facing directly.</div></td>
+          <td class="term-cell"><span class="term-name copilot-term">—</span><div class="term-note">Not applicable for single-bot architecture.</div></td>
+          <td class="term-cell"><span class="term-name dialogflow-term">—</span><div class="term-note">Not applicable; Dialogflow is user-facing.</div></td>
+          <td class="term-cell"><span class="term-name langchain-term">Human-in-the-loop (interrupt)</span><div class="term-note">LangGraph interrupt() pauses the graph and waits for human input before resuming.</div></td>
+          <td class="term-cell"><span class="term-name autogen-term">UserProxyAgent</span><div class="term-note">Core AutoGen agent that represents the human. Can auto-reply or request real input.</div></td>
+          <td class="term-cell"><span class="term-name crewai-term">Human Input (human_input_mode)</span><div class="term-note">human_input_mode="ALWAYS" on an agent pauses for real human approval.</div></td>
+        </tr>
+
+        <tr data-group="agent">
+          <td class="concept-cell">
+            <div class="concept-name"><span class="concept-icon" style="background:rgba(232,93,154,0.15)">📋</span>Role / Persona</div>
+            <div class="concept-def">The identity, expertise, and behavioral framing given to an agent that shapes how it responds and what it focuses on.</div>
+            <div class="concept-example">"You are a senior financial analyst…", role="Researcher"</div>
+          </td>
+          <td class="term-cell"><span class="term-name lex-term">—</span><div class="term-note">Not a concept in Lex; behavior defined by intents and Lambda logic.</div></td>
+          <td class="term-cell"><span class="term-name copilot-term">Identity / Instructions</span><div class="term-note">Set in "Configure" tab; defines the copilot's name, tone, and scope.</div></td>
+          <td class="term-cell"><span class="term-name dialogflow-term">Agent Description</span><div class="term-note">High-level description used by generative playbooks.</div></td>
+          <td class="term-cell"><span class="term-name langchain-term">System Prompt</span><div class="term-note">Injected into every LLM call to define persona and behavioral constraints.</div></td>
+          <td class="term-cell"><span class="term-name autogen-term">system_message</span><div class="term-note">Constructor arg on ConversableAgent that defines the agent's role and behavior.</div></td>
+          <td class="term-cell"><span class="term-name crewai-term">role + backstory</span><div class="term-note">Explicit fields on Agent: role (short title), backstory (detailed persona narrative).</div></td>
+        </tr>
+
+        <tr data-group="agent">
+          <td class="concept-cell">
+            <div class="concept-name"><span class="concept-icon" style="background:rgba(232,93,154,0.15)">⚡</span>LLM / Model Config</div>
+            <div class="concept-def">Configuration of which underlying language model the agent uses and its inference parameters (temperature, max_tokens, etc.).</div>
+            <div class="concept-example">model="gpt-4o", temperature=0.2, max_tokens=1024</div>
+          </td>
+          <td class="term-cell"><span class="term-name lex-term">—</span><div class="term-note">Lex uses its own built-in NLU; no LLM config exposed directly.</div></td>
+          <td class="term-cell"><span class="term-name copilot-term">Generative AI Model Settings</span><div class="term-note">Configured in "AI capabilities"; selects Azure OpenAI model and controls.</div></td>
+          <td class="term-cell"><span class="term-name dialogflow-term">Generative Model Settings</span><div class="term-note">Per-agent or per-playbook model selection (Gemini family).</div></td>
+          <td class="term-cell"><span class="term-name langchain-term">LLM / ChatModel object</span><div class="term-note">ChatOpenAI(model=..., temperature=...) or any LangChain-compatible LLM.</div></td>
+          <td class="term-cell"><span class="term-name autogen-term">llm_config dict</span><div class="term-note">Passed to agent constructor: {"model": "gpt-4o", "temperature": 0.1, ...}</div></td>
+          <td class="term-cell"><span class="term-name crewai-term">llm parameter on Agent</span><div class="term-note">Agent(llm=ChatOpenAI(...)) or a string model name; supports LiteLLM backends.</div></td>
+        </tr>
+
+        <!-- ─── MEMORY / STATE ─── -->
+        <tr class="category-row"><td colspan="7">🧠 Memory / State Management</td></tr>
+
+        <tr data-group="memory">
+          <td class="concept-cell">
+            <div class="concept-name"><span class="concept-icon" style="background:rgba(61,214,200,0.15)">🗃</span>Session / Context</div>
+            <div class="concept-def">The container that holds all data for one user conversation — variables, history, and state — from start to end.</div>
+            <div class="concept-example">session_id = "user_789_20240312"</div>
+          </td>
+          <td class="term-cell"><span class="term-name lex-term">Session</span><div class="term-note">Session attributes (key-value map) persist for the session lifetime.</div></td>
+          <td class="term-cell"><span class="term-name copilot-term">Conversation Session</span><div class="term-note">Scoped variables (conversation vs. global) stored per session.</div></td>
+          <td class="term-cell"><span class="term-name dialogflow-term">Session</span><div class="term-note">Session parameters carry values across pages within one conversation.</div></td>
+          <td class="term-cell"><span class="term-name langchain-term">State (TypedDict)</span><div class="term-note">In LangGraph, the entire graph state dict is the session. Passed node-to-node.</div></td>
+          <td class="term-cell"><span class="term-name autogen-term">Chat History (messages list)</span><div class="term-note">The running list of messages exchanged between agents is the session state.</div></td>
+          <td class="term-cell"><span class="term-name crewai-term">Context / shared_memory</span><div class="term-note">Task output is passed as context to subsequent tasks; crew-level shared memory optional.</div></td>
+        </tr>
+
+        <tr data-group="memory">
+          <td class="concept-cell">
+            <div class="concept-name"><span class="concept-icon" style="background:rgba(61,214,200,0.15)">📜</span>Conversation History / Memory</div>
+            <div class="concept-def">The record of past messages and interactions that the agent uses to maintain coherent multi-turn dialogue.</div>
+            <div class="concept-example">ChatHistory, message buffer, summarized past turns</div>
+          </td>
+          <td class="term-cell"><span class="term-name lex-term">Session Attributes</span><div class="term-note">No native message history; must be managed in Lambda or session attributes.</div></td>
+          <td class="term-cell"><span class="term-name copilot-term">Conversation Variables</span><div class="term-note">Variable storage per conversation; full history not exposed natively.</div></td>
+          <td class="term-cell"><span class="term-name dialogflow-term">Session Parameters</span><div class="term-note">Values persist within a session; full history managed externally.</div></td>
+          <td class="term-cell"><span class="term-name langchain-term">Memory / ChatMessageHistory</span><div class="term-note">ConversationBufferMemory, ConversationSummaryMemory, or LangGraph state messages list.</div></td>
+          <td class="term-cell"><span class="term-name autogen-term">messages (chat history)</span><div class="term-note">The full message list on each agent; can be cleared or summarized to manage token budget.</div></td>
+          <td class="term-cell"><span class="term-name crewai-term">memory=True on Crew</span><div class="term-note">Enables short-term (in-task), long-term (SQLite), and entity memory via embeddings.</div></td>
+        </tr>
+
+        <tr data-group="memory">
+          <td class="concept-cell">
+            <div class="concept-name"><span class="concept-icon" style="background:rgba(61,214,200,0.15)">💾</span>Long-term / Persistent Memory</div>
+            <div class="concept-def">Storage that survives beyond a single session — user preferences, historical facts, past interactions stored in a DB.</div>
+            <div class="concept-example">User preference store, vector DB recall, user profile</div>
+          </td>
+          <td class="term-cell"><span class="term-name lex-term">DynamoDB (external)</span><div class="term-note">Must be built manually via Lambda + DynamoDB; not native to Lex.</div></td>
+          <td class="term-cell"><span class="term-name copilot-term">Global Variables / Dataverse</span><div class="term-note">Global-scope variables or Dataverse/Dynamics 365 for persistent user data.</div></td>
+          <td class="term-cell"><span class="term-name dialogflow-term">External DB via Webhook</span><div class="term-note">Must be implemented in fulfillment webhook; Dialogflow doesn't persist cross-session natively.</div></td>
+          <td class="term-cell"><span class="term-name langchain-term">VectorStore / LangMem</span><div class="term-note">ChromaDB, Pinecone, etc. via LangChain retrievers. LangMem adds background memory updates.</div></td>
+          <td class="term-cell"><span class="term-name autogen-term">External store + TeachableAgent</span><div class="term-note">TeachableAgent writes facts to a memo store (vector DB) and retrieves on future sessions.</div></td>
+          <td class="term-cell"><span class="term-name crewai-term">Long-term Memory (SQLite + embeddings)</span><div class="term-note">Stored in ~/.crewai/memory/; crew recalls relevant past runs using semantic search.</div></td>
+        </tr>
+
+        <!-- ─── FLOW / ORCHESTRATION ─── -->
+        <tr class="category-row"><td colspan="7">🔀 Flow / Orchestration</td></tr>
+
+        <tr data-group="flow">
+          <td class="concept-cell">
+            <div class="concept-name"><span class="concept-icon" style="background:rgba(245,158,11,0.15)">🗺</span>Flow / Graph / Pipeline</div>
+            <div class="concept-def">The top-level structure that defines how conversation steps or agent actions are sequenced and connected.</div>
+            <div class="concept-example">Start → Greet → CollectInfo → Confirm → Fulfill → End</div>
+          </td>
+          <td class="term-cell"><span class="term-name lex-term">Intent + Slot Flow</span><div class="term-note">Implicit flow: Lex follows slot elicitation order then calls fulfillment Lambda.</div></td>
+          <td class="term-cell"><span class="term-name copilot-term">Topic Canvas</span><div class="term-note">Visual node-based canvas showing the entire conversation path for a topic.</div></td>
+          <td class="term-cell"><span class="term-name dialogflow-term">Flow + Pages</span><div class="term-note">CX introduces Flows (sub-graphs) each containing Pages (states).</div></td>
+          <td class="term-cell"><span class="term-name langchain-term">LangGraph Graph (StateGraph)</span><div class="term-note">StateGraph with nodes (functions) and edges (transitions). Supports cycles and branching.</div></td>
+          <td class="term-cell"><span class="term-name autogen-term">GroupChat / Swarm</span><div class="term-note">GroupChatManager routes messages between agents. Swarm is a newer topology.</div></td>
+          <td class="term-cell"><span class="term-name crewai-term">Crew (process="sequential"/"hierarchical")</span><div class="term-note">The Crew orchestrates agent order. Sequential = chain; Hierarchical = manager routes.</div></td>
+        </tr>
+
+        <tr data-group="flow">
+          <td class="concept-cell">
+            <div class="concept-name"><span class="concept-icon" style="background:rgba(245,158,11,0.15)">📍</span>State / Node / Page</div>
+            <div class="concept-def">A discrete point in the conversation or execution where a specific action happens — a question is asked, a decision is made, or data is processed.</div>
+            <div class="concept-example">AskCityNode, ConfirmOrderPage, ExtractSlotStep</div>
+          </td>
+          <td class="term-cell"><span class="term-name lex-term">Dialog Step (implicit)</span><div class="term-note">Lex manages state implicitly through slot collection; no explicit node concept.</div></td>
+          <td class="term-cell"><span class="term-name copilot-term">Node (Message / Question / Action)</span><div class="term-note">Canvas nodes: Message, Question, Condition, Action, End Conversation.</div></td>
+          <td class="term-cell"><span class="term-name dialogflow-term">Page</span><div class="term-note">CX core unit; each Page has entry fulfillment, a form, routes, and event handlers.</div></td>
+          <td class="term-cell"><span class="term-name langchain-term">Node (function in graph)</span><div class="term-note">Any Python function added to the StateGraph is a node. Receives and returns state dict.</div></td>
+          <td class="term-cell"><span class="term-name autogen-term">Agent turn / message handler</span><div class="term-note">Each agent's reply() constitutes a step; no explicit "node" abstraction.</div></td>
+          <td class="term-cell"><span class="term-name crewai-term">Task</span><div class="term-note">Each Task is a discrete step assigned to an agent; tasks are the nodes of the crew pipeline.</div></td>
+        </tr>
+
+        <tr data-group="flow">
+          <td class="concept-cell">
+            <div class="concept-name"><span class="concept-icon" style="background:rgba(245,158,11,0.15)">➡</span>Transition / Edge / Route</div>
+            <div class="concept-def">A conditional or unconditional link that moves execution from one state/node to the next based on conditions or LLM decision.</div>
+            <div class="concept-example">if slot_filled → next_page, if condition → branch_A else branch_B</div>
+          </td>
+          <td class="term-cell"><span class="term-name lex-term">Conditional Branch (Lambda)</span><div class="term-note">Branching is done in Lambda return value (dialogAction); no visual routing.</div></td>
+          <td class="term-cell"><span class="term-name copilot-term">Condition Node / Branch</span><div class="term-note">Condition nodes create if/else branches based on variable values.</div></td>
+          <td class="term-cell"><span class="term-name dialogflow-term">Route / Transition Route</span><div class="term-note">Condition-based or intent-triggered routes move from page to page.</div></td>
+          <td class="term-cell"><span class="term-name langchain-term">Edge / Conditional Edge</span><div class="term-note">add_edge() for fixed; add_conditional_edges() for dynamic routing based on state.</div></td>
+          <td class="term-cell"><span class="term-name autogen-term">Handoff / speaker_selection_func</span><div class="term-note">GroupChatManager selects the next speaker; custom functions enable conditional routing.</div></td>
+          <td class="term-cell"><span class="term-name crewai-term">Task dependency (context=)</span><div class="term-note">context=[prev_task] chains tasks. Hierarchical process uses manager LLM to route.</div></td>
+        </tr>
+
+        <tr data-group="flow">
+          <td class="concept-cell">
+            <div class="concept-name"><span class="concept-icon" style="background:rgba(245,158,11,0.15)">🔄</span>Loop / ReAct Cycle</div>
+            <div class="concept-def">The think→act→observe loop where the agent repeatedly reasons about what to do next, calls a tool, observes the result, and continues until done.</div>
+            <div class="concept-example">Reason → Call search_tool → Observe result → Reason again → Answer</div>
+          </td>
+          <td class="term-cell"><span class="term-name lex-term">—</span><div class="term-note">Not applicable; Lex is rule/slot-driven, not reasoning-loop-driven.</div></td>
+          <td class="term-cell"><span class="term-name copilot-term">Generative Actions (Orchestrator)</span><div class="term-note">Autonomous mode uses an AI orchestrator to decide which action to call next.</div></td>
+          <td class="term-cell"><span class="term-name dialogflow-term">Playbook (Generator Loop)</span><div class="term-note">CX Playbooks enable a generator loop for autonomous multi-step task completion.</div></td>
+          <td class="term-cell"><span class="term-name langchain-term">AgentExecutor / LangGraph cycle</span><div class="term-note">AgentExecutor runs the ReAct loop. LangGraph uses explicit cycles in the graph (should_continue edge).</div></td>
+          <td class="term-cell"><span class="term-name autogen-term">ConversableAgent reply loop</span><div class="term-note">Agents exchange messages in a loop; each exchange is one think-act step.</div></td>
+          <td class="term-cell"><span class="term-name crewai-term">Agent execution loop</span><div class="term-note">Under the hood, each CrewAI agent uses a ReAct-style loop when executing a task.</div></td>
+        </tr>
+
+        <tr data-group="flow">
+          <td class="concept-cell">
+            <div class="concept-name"><span class="concept-icon" style="background:rgba(245,158,11,0.15)">🏁</span>Fulfillment / Final Answer</div>
+            <div class="concept-def">The step where the agent delivers the final response or performs the concluding action after all information is gathered and processing is done.</div>
+            <div class="concept-example">"Your flight to Paris on Jan 15 is booked! Confirmation: XY291"</div>
+          </td>
+          <td class="term-cell"><span class="term-name lex-term">Fulfillment Lambda</span><div class="term-note">Lambda function called after all slots are filled; returns final response to user.</div></td>
+          <td class="term-cell"><span class="term-name copilot-term">Message Node (End)</span><div class="term-note">Final message or "End Conversation" node delivers the closing response.</div></td>
+          <td class="term-cell"><span class="term-name dialogflow-term">End Flow / Response Fulfillment</span><div class="term-note">Webhook response or static text response on the final page transition.</div></td>
+          <td class="term-cell"><span class="term-name langchain-term">Final Response / END node</span><div class="term-note">When the graph reaches END, the last state value (typically "messages[-1]") is the answer.</div></td>
+          <td class="term-cell"><span class="term-name autogen-term">Termination (is_termination_msg)</span><div class="term-note">Conversation ends when termination condition is met; last assistant message is the output.</div></td>
+          <td class="term-cell"><span class="term-name crewai-term">Task Output / Crew Output</span><div class="term-note">Each task returns a TaskOutput; the final task's output is the crew's result.</div></td>
+        </tr>
+
+        <tr data-group="flow">
+          <td class="concept-cell">
+            <div class="concept-name"><span class="concept-icon" style="background:rgba(245,158,11,0.15)">📡</span>Handoff / Delegation</div>
+            <div class="concept-def">The transfer of control from one agent to another — either escalating to a specialist or handing off to a human.</div>
+            <div class="concept-example">BillingAgent → EscalateToHuman, ResearchAgent → WriterAgent</div>
+          </td>
+          <td class="term-cell"><span class="term-name lex-term">—</span><div class="term-note">Not native; can forward session to Connect agent queue via Lambda.</div></td>
+          <td class="term-cell"><span class="term-name copilot-term">Escalate to Human / Transfer Topic</span><div class="term-note">Built-in "Transfer Conversation" node hands off to live agent queue.</div></td>
+          <td class="term-cell"><span class="term-name dialogflow-term">Live Agent Handoff</span><div class="term-note">Built-in event that routes conversation to CCAI-integrated human agent.</div></td>
+          <td class="term-cell"><span class="term-name langchain-term">Handoff (LangGraph node)</span><div class="term-note">A conditional edge routes to a different subgraph or agent node based on state.</div></td>
+          <td class="term-cell"><span class="term-name autogen-term">Agent-to-Agent Message / Handoff</span><div class="term-note">An agent sends a message to another agent; GroupChatManager facilitates multi-agent handoffs.</div></td>
+          <td class="term-cell"><span class="term-name crewai-term">delegate_work Tool</span><div class="term-note">Agents can call delegate_work() to hand a sub-task to a colleague agent by name.</div></td>
+        </tr>
+
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+function filterRows(group, btn) {
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+
+  const rows = document.querySelectorAll('tbody tr[data-group]');
+  const catRows = document.querySelectorAll('tr.category-row');
+
+  if (group === 'all') {
+    rows.forEach(r => r.classList.remove('hidden'));
+    catRows.forEach(r => r.classList.remove('hidden'));
+    return;
+  }
+
+  rows.forEach(r => {
+    r.classList.toggle('hidden', r.dataset.group !== group);
+  });
+
+  // Show/hide category headers
+  catRows.forEach(r => {
+    // Find which group this category belongs to
+    const txt = r.querySelector('td').textContent.toLowerCase();
+    const map = { nlp: 'nlp', agent: 'agent', memory: 'memory', flow: 'flow' };
+    let matches = false;
+    for (const [k, v] of Object.entries(map)) {
+      if (txt.includes(k) && v === group) matches = true;
+    }
+    r.classList.toggle('hidden', !matches);
+  });
+}
+</script>
+</body>
+</html>
