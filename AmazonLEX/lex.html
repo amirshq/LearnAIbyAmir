@@ -109,11 +109,14 @@
     margin-left: 270px;
     flex: 1;
     min-height: 100vh;
+    min-width: 0;
+    overflow-x: hidden;
   }
   .section {
     display: none;
-    padding: 52px 60px 80px;
-    max-width: 860px;
+    padding: 52px 48px 80px;
+    width: 100%;
+    max-width: 1100px;
     animation: fadeIn 0.3s ease;
   }
   .section.active { display: block; }
@@ -187,10 +190,12 @@
   /* HIGHLIGHT BOXES */
   .box {
     border-radius: 8px;
-    padding: 18px 22px;
+    padding: 20px 28px;
     margin: 20px 0;
     border-left: 3px solid;
     font-size: 13.5px;
+    width: 100%;
+    display: block;
   }
   .box.info { background: rgba(0,212,170,0.07); border-color: var(--accent2); }
   .box.warn { background: rgba(255,107,53,0.08); border-color: var(--accent); }
@@ -202,19 +207,12 @@
   .box.purple .box-label { color: var(--accent3); }
 
   /* CODE BLOCKS */
-  pre {
-    background: var(--code-bg);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 20px;
-    overflow-x: auto;
-    margin: 16px 0 24px;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 12.5px;
-    line-height: 1.75;
+  .code-wrap {
     position: relative;
+    margin: 16px 0 24px;
+    width: 100%;
   }
-  pre .copy-btn {
+  .code-wrap .copy-btn {
     position: absolute;
     top: 10px; right: 12px;
     background: var(--surface);
@@ -226,8 +224,32 @@
     cursor: pointer;
     font-family: 'JetBrains Mono', monospace;
     transition: all 0.15s;
+    z-index: 2;
   }
-  pre .copy-btn:hover { background: var(--accent); color: white; border-color: var(--accent); }
+  .code-wrap .copy-btn:hover { background: var(--accent); color: white; border-color: var(--accent); }
+  pre {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 24px 28px;
+    overflow-x: auto;
+    margin: 0;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12.5px;
+    line-height: 1.75;
+    width: 100%;
+    display: block;
+    white-space: pre;
+    word-break: normal;
+    word-wrap: normal;
+  }
+  .card pre {
+    white-space: pre;
+    word-break: normal;
+    word-wrap: normal;
+    font-size: 11.5px;
+    padding: 14px 18px;
+  }
   .kw { color: #ff79c6; }
   .str { color: #f1fa8c; }
   .cm { color: #6272a4; }
@@ -275,6 +297,8 @@
     text-align: center;
     font-family: 'JetBrains Mono', monospace;
     font-size: 12px;
+    width: 100%;
+    display: block;
   }
   .arch-row { display: flex; justify-content: center; align-items: center; gap: 0; margin: 6px 0; flex-wrap: wrap; }
   .arch-box {
@@ -383,21 +407,21 @@
   </div>
   <nav class="sidebar-nav">
     <div class="nav-section-label">Foundation</div>
-    <div class="nav-item active" onclick="goto(0)"><span class="num">01</span> What is Amazon Lex?</div>
-    <div class="nav-item" onclick="goto(1)"><span class="num">02</span> Core Concepts</div>
-    <div class="nav-item" onclick="goto(2)"><span class="num">03</span> Console Walkthrough</div>
+    <div class="nav-item active" onclick="navTo(0)"><span class="num">01</span> What is Amazon Lex?</div>
+    <div class="nav-item" onclick="navTo(1)"><span class="num">02</span> Core Concepts</div>
+    <div class="nav-item" onclick="navTo(2)"><span class="num">03</span> Console Walkthrough</div>
 
     <div class="nav-section-label">Building Bots</div>
-    <div class="nav-item" onclick="goto(3)"><span class="num">04</span> Your First Bot</div>
-    <div class="nav-item" onclick="goto(4)"><span class="num">05</span> Intents & Utterances</div>
-    <div class="nav-item" onclick="goto(5)"><span class="num">06</span> Slots & Slot Types</div>
-    <div class="nav-item" onclick="goto(6)"><span class="num">07</span> Fulfillment & Lambda</div>
+    <div class="nav-item" onclick="navTo(3)"><span class="num">04</span> Your First Bot</div>
+    <div class="nav-item" onclick="navTo(4)"><span class="num">05</span> Intents & Utterances</div>
+    <div class="nav-item" onclick="navTo(5)"><span class="num">06</span> Slots & Slot Types</div>
+    <div class="nav-item" onclick="navTo(6)"><span class="num">07</span> Fulfillment & Lambda</div>
 
     <div class="nav-section-label">Advanced</div>
-    <div class="nav-item" onclick="goto(7)"><span class="num">08</span> Conversation Flow</div>
-    <div class="nav-item" onclick="goto(8)"><span class="num">09</span> Multi-Channel Deploy</div>
-    <div class="nav-item" onclick="goto(9)"><span class="num">10</span> Analytics & Testing</div>
-    <div class="nav-item" onclick="goto(10)"><span class="num">11</span> Real-World Project</div>
+    <div class="nav-item" onclick="navTo(7)"><span class="num">08</span> Conversation Flow</div>
+    <div class="nav-item" onclick="navTo(8)"><span class="num">09</span> Multi-Channel Deploy</div>
+    <div class="nav-item" onclick="navTo(9)"><span class="num">10</span> Analytics & Testing</div>
+    <div class="nav-item" onclick="navTo(10)"><span class="num">11</span> Real-World Project</div>
   </nav>
   <div class="progress-bar-wrap">
     <div class="progress-label">Progress <span id="prog-txt">0%</span></div>
@@ -465,7 +489,7 @@
 
   <div class="nav-btns">
     <button class="btn btn-ghost" disabled>← Previous</button>
-    <button class="btn btn-primary" onclick="goto(1)">Core Concepts →</button>
+    <button class="btn btn-primary" onclick="navTo(1)">Core Concepts →</button>
   </div>
 </section>
 
@@ -555,8 +579,8 @@
   </div>
 
   <div class="nav-btns">
-    <button class="btn btn-ghost" onclick="goto(0)">← What is Lex</button>
-    <button class="btn btn-primary" onclick="goto(2)">Console Walkthrough →</button>
+    <button class="btn btn-ghost" onclick="navTo(0)">← What is Lex</button>
+    <button class="btn btn-primary" onclick="navTo(2)">Console Walkthrough →</button>
   </div>
 </section>
 
@@ -633,8 +657,8 @@
   </div>
 
   <div class="nav-btns">
-    <button class="btn btn-ghost" onclick="goto(1)">← Core Concepts</button>
-    <button class="btn btn-primary" onclick="goto(3)">Build Your First Bot →</button>
+    <button class="btn btn-ghost" onclick="navTo(1)">← Core Concepts</button>
+    <button class="btn btn-primary" onclick="navTo(3)">Build Your First Bot →</button>
   </div>
 </section>
 
@@ -674,7 +698,7 @@
 
   <h3>Step 2: Add Utterances</h3>
   <p>Add at least 10 varied utterances. Lex learns from them to match user input:</p>
-  <pre><button class="copy-btn" onclick="copyPre(this)">copy</button><span class="cm"># Sample utterances for OrderPizza intent</span>
+  <div class="code-wrap"><button class="copy-btn" onclick="copyPre(this)">copy</button><pre><span class="cm"># Sample utterances for OrderPizza intent</span>
 I want to order a pizza
 Can I get a pizza please
 Order me a {PizzaSize} pizza
@@ -684,7 +708,7 @@ I want a large pizza with extra cheese
 Place a pizza order for me
 Can you order a medium thin crust pizza
 I'd like to place a pizza order
-One pizza please</pre>
+One pizza please</pre></div>
 
   <div class="box info">
     <div class="box-label">💡 Slot References in Utterances</div>
@@ -693,7 +717,7 @@ One pizza please</pre>
 
   <h3>Step 3: Create Slot Types</h3>
   <p>Before creating slots, define the custom types. Go to <strong>Slot types</strong> → <strong>Add slot type</strong>:</p>
-  <pre><button class="copy-btn" onclick="copyPre(this)">copy</button><span class="cm"># Slot Type: PizzaSizeType</span>
+  <div class="code-wrap"><button class="copy-btn" onclick="copyPre(this)">copy</button><pre><span class="cm"># Slot Type: PizzaSizeType</span>
 <span class="key">Type:</span>   <span class="str">Custom slot type (Expand values)</span>
 <span class="key">Values:</span>
   - Small  (synonyms: sm, personal)
@@ -711,7 +735,7 @@ One pizza please</pre>
 <span class="cm"># Slot Type: ToppingType (AMAZON.AlphaNumeric also works)</span>
 <span class="key">Values:</span>
   - Cheese, Pepperoni, Mushrooms, Onions
-  - Olives, Peppers, Bacon, Pineapple</pre>
+  - Olives, Peppers, Bacon, Pineapple</pre></div>
 
   <h3>Step 4: Add Slots to the Intent</h3>
   <p>Back in your <code>OrderPizza</code> intent → <strong>Slots</strong> section → Add three slots:</p>
@@ -726,16 +750,16 @@ One pizza please</pre>
 
   <h3>Step 5: Confirmation Prompt</h3>
   <p>Enable the <strong>Confirmation prompt</strong> in the intent settings:</p>
-  <pre><button class="copy-btn" onclick="copyPre(this)">copy</button><span class="key">Confirmation prompt:</span>
+  <div class="code-wrap"><button class="copy-btn" onclick="copyPre(this)">copy</button><pre><span class="key">Confirmation prompt:</span>
 <span class="str">"Just to confirm: a {PizzaSize} pizza with {CrustType} crust"</span>
 <span class="str">"and {Toppings}. Shall I place this order?"</span>
 
 <span class="key">Decline response:</span>
-<span class="str">"No problem, order cancelled. Let me know if you'd like anything else."</span></pre>
+<span class="str">"No problem, order cancelled. Let me know if you'd like anything else."</span></pre></div>
 
   <h3>Step 6: Build & Test</h3>
   <p>Click <strong>Build</strong> (top right). Wait ~30 seconds. Then use the <strong>Test</strong> panel to have a conversation:</p>
-  <pre><button class="copy-btn" onclick="copyPre(this)">copy</button"><span class="cm">You:</span>  I want a pizza
+  <div class="code-wrap"><button class="copy-btn" onclick="copyPre(this)">copy</button><pre><span class="cm">You:</span>  I want a pizza
 <span class="key">Bot:</span>  What size pizza would you like?
 <span class="cm">You:</span>  Large
 <span class="key">Bot:</span>  What type of crust would you like?
@@ -744,11 +768,11 @@ One pizza please</pre>
 <span class="cm">You:</span>  Pepperoni and mushrooms
 <span class="key">Bot:</span>  Just to confirm: a Large pizza with Thin crust and Pepperoni and mushrooms. Shall I place this order?
 <span class="cm">You:</span>  Yes
-<span class="key">Bot:</span>  [Fulfillment response]</pre>
+<span class="key">Bot:</span>  [Fulfillment response]</pre></div>
 
   <div class="nav-btns">
-    <button class="btn btn-ghost" onclick="goto(2)">← Console Walkthrough</button>
-    <button class="btn btn-primary" onclick="goto(4)">Intents Deep Dive →</button>
+    <button class="btn btn-ghost" onclick="navTo(2)">← Console Walkthrough</button>
+    <button class="btn btn-primary" onclick="navTo(4)">Intents Deep Dive →</button>
   </div>
 </section>
 
@@ -787,7 +811,7 @@ One pizza please</pre>
     <p>Don't add 3 utterances and wonder why NLU fails. Lex needs <strong>15–30 diverse utterances per intent</strong> for robust recognition. Vary structure, not just wording.</p>
   </div>
 
-  <pre><button class="copy-btn" onclick="copyPre(this)">copy</button"><span class="cm"># ❌ BAD - Too similar, low diversity</span>
+  <div class="code-wrap"><button class="copy-btn" onclick="copyPre(this)">copy</button><pre><span class="cm"># ❌ BAD - Too similar, low diversity</span>
 I want to book a flight
 I would like to book a flight
 Book me a flight
@@ -802,29 +826,29 @@ Get me on a flight to {Destination}
 Reserve a seat for me
 I'd like to make a flight reservation
 Schedule a flight for next {Date}
-{Destination} please, flying {Date}</pre>
+{Destination} please, flying {Date}</pre></div>
 
   <h3>Intent Priority & Disambiguation</h3>
   <p>When multiple intents could match, Lex picks the highest confidence score. If two intents score similarly, you can configure <strong>clarification prompts</strong> — Lex asks "Did you mean X or Y?"</p>
 
-  <pre><button class="copy-btn" onclick="copyPre(this)">copy</button"><span class="cm"># Enable in console: Bot Settings > Clarification</span>
+  <div class="code-wrap"><button class="copy-btn" onclick="copyPre(this)">copy</button><pre><span class="cm"># Enable in console: Bot Settings > Clarification</span>
 <span class="key">Clarification prompt:</span>
 <span class="str">"I'm not sure what you mean. Did you want to (1) check order status or (2) place a new order?"</span>
 <span class="key">Max clarification retries:</span> <span class="num">2</span>
-<span class="key">If still unclear:</span> trigger FallbackIntent</pre>
+<span class="key">If still unclear:</span> trigger FallbackIntent</pre></div>
 
   <h3>Closing Responses</h3>
   <p>Every intent should have a <strong>closing response</strong> for when it ends successfully. This replaces the plain "Intent fulfilled" default message.</p>
 
-  <pre><button class="copy-btn" onclick="copyPre(this)">copy</button"><span class="cm"># In Lex Console: Intent > Closing response</span>
+  <div class="code-wrap"><button class="copy-btn" onclick="copyPre(this)">copy</button><pre><span class="cm"># In Lex Console: Intent > Closing response</span>
 <span class="key">Message:</span> <span class="str">"Your {PizzaSize} pizza has been ordered! ETA: 30 minutes. Enjoy! 🍕"</span>
 
 <span class="cm"># You can also use session attributes in messages:</span>
-<span class="key">Message:</span> <span class="str">"Order #{orderRef} confirmed for {CustomerName}. Check your email for details."</span></pre>
+<span class="key">Message:</span> <span class="str">"Order #{orderRef} confirmed for {CustomerName}. Check your email for details."</span></pre></div>
 
   <div class="nav-btns">
-    <button class="btn btn-ghost" onclick="goto(3)">← First Bot</button>
-    <button class="btn btn-primary" onclick="goto(5)">Slots & Slot Types →</button>
+    <button class="btn btn-ghost" onclick="navTo(3)">← First Bot</button>
+    <button class="btn btn-primary" onclick="navTo(5)">Slots & Slot Types →</button>
   </div>
 </section>
 
@@ -842,7 +866,7 @@ Schedule a flight for next {Date}
       <tr><td><code>AMAZON.Time</code></td><td>Times</td><td>"3pm" → 15:00</td></tr>
       <tr><td><code>AMAZON.Duration</code></td><td>Time spans</td><td>"2 hours" → PT2H</td></tr>
       <tr><td><code>AMAZON.Number</code></td><td>Integers/floats</td><td>"forty two" → 42</td></tr>
-      <tr><td><code>AMAZON.EmailAddress</code></td><td>Email strings</td><td>user@example.com</td></tr>
+      <tr><td><code>AMAZON.EmailAddress</code></td><td>Email strings</td><td><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="88fdfbedfac8edf0e9e5f8e4eda6ebe7e5">[email&#160;protected]</a></td></tr>
       <tr><td><code>AMAZON.PhoneNumber</code></td><td>Phone numbers</td><td>+1-800-555-0100</td></tr>
       <tr><td><code>AMAZON.City</code></td><td>US city names</td><td>New York, Boston</td></tr>
       <tr><td><code>AMAZON.AlphaNumeric</code></td><td>Any word/phrase</td><td>Free-form string</td></tr>
@@ -868,7 +892,7 @@ Schedule a flight for next {Date}
   </div>
 
   <h3>Slot Prompts & Retries</h3>
-  <pre><button class="copy-btn" onclick="copyPre(this)">copy</button"><span class="cm"># Slot configuration in Lex console</span>
+  <div class="code-wrap"><button class="copy-btn" onclick="copyPre(this)">copy</button><pre><span class="cm"># Slot configuration in Lex console</span>
 <span class="key">Slot:</span> DepartureCity
 <span class="key">Type:</span> AMAZON.City
 <span class="key">Required:</span> <span class="val">true</span>
@@ -879,11 +903,11 @@ Schedule a flight for next {Date}
   <span class="str">"Please tell me where you're departing from."</span>  <span class="cm"># Retry 2</span>
 
 <span class="key">Max retries:</span> <span class="num">2</span>
-<span class="key">If still not filled:</span> Close with failure response</pre>
+<span class="key">If still not filled:</span> Close with failure response</pre></div>
 
   <h3>Slot Validation via Lambda</h3>
   <p>Use a <strong>validation hook</strong> to check slot values in real-time before the conversation proceeds:</p>
-  <pre><button class="copy-btn" onclick="copyPre(this)">copy</button"><span class="kw">import</span> json
+  <div class="code-wrap"><button class="copy-btn" onclick="copyPre(this)">copy</button><pre><span class="kw">import</span> json
 
 <span class="kw">def</span> <span class="fn">lambda_handler</span>(event, context):
     invocation_source = event[<span class="str">'invocationSource'</span>]
@@ -920,11 +944,11 @@ Schedule a flight for next {Date}
             <span class="str">'dialogAction'</span>: {<span class="str">'type'</span>: <span class="str">'Delegate'</span>},
             <span class="str">'intent'</span>: event[<span class="str">'sessionState'</span>][<span class="str">'intent'</span>]
         }
-    }</pre>
+    }</pre></div>
 
   <div class="nav-btns">
-    <button class="btn btn-ghost" onclick="goto(4)">← Intents</button>
-    <button class="btn btn-primary" onclick="goto(6)">Fulfillment & Lambda →</button>
+    <button class="btn btn-ghost" onclick="navTo(4)">← Intents</button>
+    <button class="btn btn-primary" onclick="navTo(6)">Fulfillment & Lambda →</button>
   </div>
 </section>
 
@@ -950,7 +974,7 @@ Schedule a flight for next {Date}
 
   <h3>The Lambda Event Structure</h3>
   <p>Lex sends this JSON to your Lambda function. Understanding it is critical:</p>
-  <pre><button class="copy-btn" onclick="copyPre(this)">copy</button">{
+  <div class="code-wrap"><button class="copy-btn" onclick="copyPre(this)">copy</button><pre>{
   <span class="key">"sessionId"</span>: <span class="str">"user-abc-123"</span>,
   <span class="key">"invocationSource"</span>: <span class="str">"FulfillmentCodeHook"</span>,  <span class="cm">// or "DialogCodeHook"</span>
   <span class="key">"inputTranscript"</span>: <span class="str">"Large pepperoni thin crust please"</span>,
@@ -978,10 +1002,10 @@ Schedule a flight for next {Date}
       <span class="key">"userId"</span>: <span class="str">"user-abc-123"</span>
     }
   }
-}</pre>
+}</pre></div>
 
   <h3>Complete Fulfillment Lambda (Python)</h3>
-  <pre><button class="copy-btn" onclick="copyPre(this)">copy</button><span class="kw">import</span> json
+  <div class="code-wrap"><button class="copy-btn" onclick="copyPre(this)">copy</button><pre><span class="kw">import</span> json
 <span class="kw">import</span> boto3
 <span class="kw">from</span> datetime <span class="kw">import</span> datetime
 <span class="kw">import</span> uuid
@@ -1034,7 +1058,7 @@ orders_table = dynamodb.Table(<span class="str">'PizzaOrders'</span>)
             <span class="str">'sessionAttributes'</span>: event[<span class="str">'sessionState'</span>].get(<span class="str">'sessionAttributes'</span>, {})
         },
         <span class="str">'messages'</span>: [{<span class="str">'contentType'</span>: <span class="str">'PlainText'</span>, <span class="str">'content'</span>: message}]
-    }</pre>
+    }</pre></div>
 
   <div class="box warn">
     <div class="box-label">⚠️ Lambda Permission</div>
@@ -1042,8 +1066,8 @@ orders_table = dynamodb.Table(<span class="str">'PizzaOrders'</span>)
   </div>
 
   <div class="nav-btns">
-    <button class="btn btn-ghost" onclick="goto(5)">← Slots</button>
-    <button class="btn btn-primary" onclick="goto(7)">Conversation Flow →</button>
+    <button class="btn btn-ghost" onclick="navTo(5)">← Slots</button>
+    <button class="btn btn-primary" onclick="navTo(7)">Conversation Flow →</button>
   </div>
 </section>
 
@@ -1075,7 +1099,7 @@ orders_table = dynamodb.Table(<span class="str">'PizzaOrders'</span>)
   <h3>Session Attributes</h3>
   <p>Session attributes are key-value pairs that persist across <strong>the entire session</strong> (all intents). Use them to carry context:</p>
 
-  <pre><button class="copy-btn" onclick="copyPre(this)">copy</button"><span class="cm"># Lambda: Set a session attribute</span>
+  <div class="code-wrap"><button class="copy-btn" onclick="copyPre(this)">copy</button><pre><span class="cm"># Lambda: Set a session attribute</span>
 session_attrs = event[<span class="str">'sessionState'</span>].get(<span class="str">'sessionAttributes'</span>, {})
 session_attrs[<span class="str">'customerTier'</span>] = <span class="str">'GOLD'</span>
 session_attrs[<span class="str">'cartTotal'</span>] = <span class="str">'29.99'</span>
@@ -1087,7 +1111,7 @@ session_attrs[<span class="str">'cartTotal'</span>] = <span class="str">'29.99'<
         <span class="str">'intent'</span>: event[<span class="str">'sessionState'</span>][<span class="str">'intent'</span>],
         <span class="str">'sessionAttributes'</span>: session_attrs   <span class="cm"># ← persisted!</span>
     }
-}</pre>
+}</pre></div>
 
   <h3>Request Attributes vs Session Attributes</h3>
   <table>
@@ -1100,7 +1124,7 @@ session_attrs[<span class="str">'cartTotal'</span>] = <span class="str">'29.99'<
 
   <h3>Switching Intents Mid-Conversation</h3>
   <p>Users often switch topics. Lex handles this via <strong>intent chaining</strong>. You can force a switch via Lambda:</p>
-  <pre><button class="copy-btn" onclick="copyPre(this)">copy</button"><span class="cm"># Lambda: switch to a different intent</span>
+  <div class="code-wrap"><button class="copy-btn" onclick="copyPre(this)">copy</button><pre><span class="cm"># Lambda: switch to a different intent</span>
 <span class="kw">return</span> {
     <span class="str">'sessionState'</span>: {
         <span class="str">'dialogAction'</span>: {<span class="str">'type'</span>: <span class="str">'ElicitIntent'</span>},
@@ -1111,7 +1135,7 @@ session_attrs[<span class="str">'cartTotal'</span>] = <span class="str">'29.99'<
         <span class="str">'contentType'</span>: <span class="str">'PlainText'</span>,
         <span class="str">'content'</span>: <span class="str">'Sure! Let me check your order status. What\\'s your order number?'</span>
     }]
-}</pre>
+}</pre></div>
 
   <h3>Dialog Actions Reference</h3>
   <table>
@@ -1126,8 +1150,8 @@ session_attrs[<span class="str">'cartTotal'</span>] = <span class="str">'29.99'<
   </table>
 
   <div class="nav-btns">
-    <button class="btn btn-ghost" onclick="goto(6)">← Fulfillment</button>
-    <button class="btn btn-primary" onclick="goto(8)">Multi-Channel Deploy →</button>
+    <button class="btn btn-ghost" onclick="navTo(6)">← Fulfillment</button>
+    <button class="btn btn-primary" onclick="navTo(8)">Multi-Channel Deploy →</button>
   </div>
 </section>
 
@@ -1155,7 +1179,7 @@ session_attrs[<span class="str">'cartTotal'</span>] = <span class="str">'29.99'<
   </div>
 
   <h3>Option A: Embedded Web Chat (AWS Amplify)</h3>
-  <pre><button class="copy-btn" onclick="copyPre(this)">copy</button"><span class="cm">// Install: npm install @aws-sdk/client-lex-runtime-v2</span>
+  <div class="code-wrap"><button class="copy-btn" onclick="copyPre(this)">copy</button><pre><span class="cm">// Install: npm install @aws-sdk/client-lex-runtime-v2</span>
 <span class="kw">import</span> { LexRuntimeV2Client, RecognizeTextCommand } <span class="kw">from</span> <span class="str">"@aws-sdk/client-lex-runtime-v2"</span>;
 
 <span class="kw">const</span> client = <span class="kw">new</span> <span class="fn">LexRuntimeV2Client</span>({
@@ -1179,7 +1203,7 @@ session_attrs[<span class="str">'cartTotal'</span>] = <span class="str">'29.99'<
 }
 
 <span class="cm">// Usage</span>
-<span class="fn">sendMessage</span>(<span class="str">"I want to order a large pizza"</span>);</pre>
+<span class="fn">sendMessage</span>(<span class="str">"I want to order a large pizza"</span>);</pre></div>
 
   <h3>Option B: Slack Integration</h3>
   <div class="steps">
@@ -1199,7 +1223,7 @@ session_attrs[<span class="str">'cartTotal'</span>] = <span class="str">'29.99'<
 
   <h3>Option C: Amazon Connect (Voice Bot)</h3>
   <p>This is the most powerful deployment — a full IVR / voice contact center with Lex as the NLU brain:</p>
-  <pre><button class="copy-btn" onclick="copyPre(this)">copy</button"><span class="cm"># Amazon Connect Contact Flow snippet (JSON)</span>
+  <div class="code-wrap"><button class="copy-btn" onclick="copyPre(this)">copy</button><pre><span class="cm"># Amazon Connect Contact Flow snippet (JSON)</span>
 {
   <span class="key">"Type"</span>: <span class="str">"GetParticipantInput"</span>,
   <span class="key">"Parameters"</span>: {
@@ -1208,10 +1232,10 @@ session_attrs[<span class="str">'cartTotal'</span>] = <span class="str">'29.99'<
       <span class="key">"AliasArn"</span>: <span class="str">"arn:aws:lex:us-east-1:123456789:bot-alias/BOTID/ALIASID"</span>
     }
   }
-}</pre>
+}</pre></div>
 
   <h3>Using API Gateway for Custom Web Integration</h3>
-  <pre><button class="copy-btn" onclick="copyPre(this)">copy</button"><span class="cm"># Lambda proxy to Lex (keeps credentials server-side)</span>
+  <div class="code-wrap"><button class="copy-btn" onclick="copyPre(this)">copy</button><pre><span class="cm"># Lambda proxy to Lex (keeps credentials server-side)</span>
 <span class="kw">import</span> boto3, json
 
 lex = boto3.client(<span class="str">'lexv2-runtime'</span>, region_name=<span class="str">'us-east-1'</span>)
@@ -1233,11 +1257,11 @@ lex = boto3.client(<span class="str">'lexv2-runtime'</span>, region_name=<span c
         <span class="str">'statusCode'</span>: <span class="num">200</span>,
         <span class="str">'headers'</span>: {<span class="str">'Access-Control-Allow-Origin'</span>: <span class="str">'*'</span>},
         <span class="str">'body'</span>: json.dumps({<span class="str">'reply'</span>: reply})
-    }</pre>
+    }</pre></div>
 
   <div class="nav-btns">
-    <button class="btn btn-ghost" onclick="goto(7)">← Conversation Flow</button>
-    <button class="btn btn-primary" onclick="goto(9)">Analytics & Testing →</button>
+    <button class="btn btn-ghost" onclick="navTo(7)">← Conversation Flow</button>
+    <button class="btn btn-primary" onclick="navTo(9)">Analytics & Testing →</button>
   </div>
 </section>
 
@@ -1256,14 +1280,14 @@ lex = boto3.client(<span class="str">'lexv2-runtime'</span>, region_name=<span c
 
   <h3>Missed Utterances — Your #1 Improvement Tool</h3>
   <p>The <strong>Missed Utterances</strong> report shows exactly what users said that Lex couldn't match. Review weekly and add them as utterances:</p>
-  <pre><button class="copy-btn" onclick="copyPre(this)">copy</button"><span class="cm"># Example missed utterances to review:</span>
+  <div class="code-wrap"><button class="copy-btn" onclick="copyPre(this)">copy</button><pre><span class="cm"># Example missed utterances to review:</span>
 <span class="str">"gimme a pizza"</span>         <span class="cm">→ Add to OrderPizza</span>
 <span class="str">"what's in my cart"</span>     <span class="cm">→ Add to CheckCart intent</span>
 <span class="str">"cancel that"</span>           <span class="cm">→ Add to CancelOrder</span>
-<span class="str">"speak to a person"</span>     <span class="cm">→ Add to EscalateToAgent</span></pre>
+<span class="str">"speak to a person"</span>     <span class="cm">→ Add to EscalateToAgent</span></pre></div>
 
   <h3>Testing with the CLI (Automated)</h3>
-  <pre><button class="copy-btn" onclick="copyPre(this)">copy</button"><span class="cm"># Test a Lex bot via AWS CLI</span>
+  <div class="code-wrap"><button class="copy-btn" onclick="copyPre(this)">copy</button><pre><span class="cm"># Test a Lex bot via AWS CLI</span>
 aws lexv2-runtime recognize-text \
   --bot-id <span class="str">YOUR_BOT_ID</span> \
   --bot-alias-id <span class="str">TSTALIASID</span> \
@@ -1286,10 +1310,10 @@ aws lexv2-runtime recognize-text \
       }
     }
   }
-}</pre>
+}</pre></div>
 
   <h3>Automated Test Script (Python)</h3>
-  <pre><button class="copy-btn" onclick="copyPre(this)">copy</button"><span class="kw">import</span> boto3, json
+  <div class="code-wrap"><button class="copy-btn" onclick="copyPre(this)">copy</button><pre><span class="kw">import</span> boto3, json
 
 lex = boto3.client(<span class="str">'lexv2-runtime'</span>)
 
@@ -1307,7 +1331,7 @@ test_cases = [
     )
     actual = resp[<span class="str">'sessionState'</span>][<span class="str">'intent'</span>][<span class="str">'name'</span>]
     status = <span class="str">'✅ PASS'</span> <span class="kw">if</span> actual == test[<span class="str">'expected_intent'</span>] <span class="kw">else</span> <span class="str">'❌ FAIL'</span>
-    <span class="fn">print</span>(<span class="fn">f</span><span class="str">"{status} | '{test['input']}' → {actual}"</span>)</pre>
+    <span class="fn">print</span>(<span class="fn">f</span><span class="str">"{status} | '{test['input']}' → {actual}"</span>)</pre></div>
 
   <div class="quiz">
     <h4>🧠 Quick Check</h4>
@@ -1322,8 +1346,8 @@ test_cases = [
   </div>
 
   <div class="nav-btns">
-    <button class="btn btn-ghost" onclick="goto(8)">← Deployment</button>
-    <button class="btn btn-primary" onclick="goto(10)">Real-World Project →</button>
+    <button class="btn btn-ghost" onclick="navTo(8)">← Deployment</button>
+    <button class="btn btn-primary" onclick="navTo(10)">Real-World Project →</button>
   </div>
 </section>
 
@@ -1347,7 +1371,7 @@ test_cases = [
   </table>
 
   <h3>Full Lambda Architecture</h3>
-  <pre><button class="copy-btn" onclick="copyPre(this)">copy</button"><span class="kw">import</span> boto3, json
+  <div class="code-wrap"><button class="copy-btn" onclick="copyPre(this)">copy</button><pre><span class="kw">import</span> boto3, json
 
 dynamodb = boto3.resource(<span class="str">'dynamodb'</span>)
 sns = boto3.client(<span class="str">'sns'</span>)
@@ -1405,7 +1429,7 @@ accounts = dynamodb.Table(<span class="str">'BankAccounts'</span>)
             <span class="str">'sessionAttributes'</span>: event[<span class="str">'sessionState'</span>].get(<span class="str">'sessionAttributes'</span>, {})
         },
         <span class="str">'messages'</span>: [{<span class="str">'contentType'</span>: <span class="str">'PlainText'</span>, <span class="str">'content'</span>: message}]
-    }</pre>
+    }</pre></div>
 
   <h3>Security Checklist for Production</h3>
   <div class="card">
@@ -1430,13 +1454,59 @@ accounts = dynamodb.Table(<span class="str">'BankAccounts'</span>)
   </div>
 
   <div class="nav-btns">
-    <button class="btn btn-ghost" onclick="goto(9)">← Analytics</button>
-    <button class="btn btn-primary" onclick="goto(0)">↺ Start Over</button>
+    <button class="btn btn-ghost" onclick="navTo(9)">← Analytics</button>
+    <button class="btn btn-primary" onclick="navTo(0)">↺ Start Over</button>
   </div>
 </section>
 
 </main>
 
+<script>
+window.addEventListener('DOMContentLoaded', function() {
+  var current = 0;
+  var total = 11;
+  var visited = new Set([0]);
+
+  var sections = document.querySelectorAll('.section');
+  var navItems = document.querySelectorAll('.nav-item');
+
+  function updateProgress() {
+    var pct = Math.round((visited.size / total) * 100);
+    document.getElementById('prog-fill').style.width = pct + '%';
+    document.getElementById('prog-txt').textContent = pct + '%';
+  }
+
+  window.navTo = function(idx) {
+    sections[current].classList.remove('active');
+    navItems[current].classList.remove('active');
+    current = idx;
+    sections[current].classList.add('active');
+    navItems[current].classList.add('active');
+    visited.add(idx);
+    window.scrollTo(0, 0);
+    updateProgress();
+  };
+
+  window.copyPre = function(btn) {
+    var pre = btn.parentElement.querySelector('pre');
+    var text = pre.innerText.trim();
+    navigator.clipboard.writeText(text).then(function() {
+      btn.textContent = 'copied!';
+      setTimeout(function() { btn.textContent = 'copy'; }, 1500);
+    });
+  };
+
+  window.answer = function(el, correct) {
+    var opts = el.parentElement.querySelectorAll('.quiz-opt');
+    opts.forEach(function(o) { o.onclick = null; });
+    el.classList.add(correct ? 'correct' : 'wrong');
+    var fb = el.closest('.quiz').querySelector('.quiz-feedback');
+    fb.classList.add('show', correct ? 'ok' : 'bad');
+  };
+
+  updateProgress();
+});
+</script>
 <script>
 let current = 0;
 const total = 11;
@@ -1475,13 +1545,3 @@ function answer(el, correct) {
   opts.forEach(o => o.onclick = null);
   el.classList.add(correct ? 'correct' : 'wrong');
   if (!correct) {
-    opts.forEach(o => { if (o.dataset && o !== el) {} });
-  }
-  const fb = el.closest('.quiz').querySelector('.quiz-feedback');
-  fb.classList.add('show', correct ? 'ok' : 'bad');
-}
-
-updateProgress();
-</script>
-</body>
-</html>

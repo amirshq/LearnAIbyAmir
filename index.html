@@ -108,6 +108,32 @@
       gap: 18px;
     }
 
+    .topic-section {
+      margin-top: 24px;
+    }
+
+    .topic-section-header {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 4px;
+    }
+
+    .topic-section-title {
+      font-family: 'Syne', system-ui, sans-serif;
+      font-size: 15px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .topic-section-tagline {
+      font-size: 12px;
+      color: var(--muted);
+      opacity: 0.9;
+    }
+
     .topic-card {
       position: relative;
       border-radius: 18px;
@@ -218,123 +244,155 @@
       </div>
     </header>
 
-    <section class="topics-grid">
-      <a class="topic-card" href="Autogen/autogen.html">
-        <div class="topic-tag">Agents & Orchestration</div>
-        <div class="topic-title">
-          <span>AutoGen · From Scratch</span>
-          <span class="topic-arrow">↗</span>
+    <section>
+      <div class="topic-section">
+        <div class="topic-section-header">
+          <div class="topic-section-title">Low-Code & Agent Frameworks</div>
+          <div class="topic-section-tagline">Hands-on notebooks for building AI systems and bots.</div>
         </div>
-        <p class="topic-desc">Multi-agent patterns, tools, and workflows for building collaborative AI systems with AutoGen.</p>
-        <div class="topic-chip-row">
-          <span class="topic-chip">multi-agent</span>
-          <span class="topic-chip">orchestration</span>
-        </div>
-      </a>
+        <div class="topics-grid">
+          <a class="topic-card" href="Autogen/autogen.html">
+            <div class="topic-tag">Agents & Orchestration</div>
+            <div class="topic-title">
+              <span>AutoGen · From Scratch</span>
+              <span class="topic-arrow">↗</span>
+            </div>
+            <p class="topic-desc">Multi-agent patterns, tools, and workflows for building collaborative AI systems with AutoGen.</p>
+            <div class="topic-chip-row">
+              <span class="topic-chip">multi-agent</span>
+              <span class="topic-chip">orchestration</span>
+            </div>
+          </a>
 
-      <a class="topic-card" href="Langgraph & Langchain/langraph&langchain.html">
-        <div class="topic-tag">Framework Comparison</div>
-        <div class="topic-title">
-          <span>LangGraph & LangChain</span>
-          <span class="topic-arrow">↗</span>
-        </div>
-        <p class="topic-desc">Side‑by‑side exploration of graph- and chain-based LLM application patterns.</p>
-        <div class="topic-chip-row">
-          <span class="topic-chip">langgraph</span>
-          <span class="topic-chip">langchain</span>
-        </div>
-      </a>
+          <a class="topic-card" href="CrewAI/crewai.html">
+            <div class="topic-tag">Agents & Crews</div>
+            <div class="topic-title">
+              <span>CrewAI</span>
+              <span class="topic-arrow">↗</span>
+            </div>
+            <p class="topic-desc">Patterns for coordinating “crews” of specialized agents to solve complex tasks.</p>
+            <div class="topic-chip-row">
+              <span class="topic-chip">agents</span>
+              <span class="topic-chip">coordination</span>
+            </div>
+          </a>
 
-      <a class="topic-card" href="AI102 Azure AI Engineer Course/azureAI102.html">
-        <div class="topic-tag">Certification Prep</div>
-        <div class="topic-title">
-          <span>Azure AI-102 Notes</span>
-          <span class="topic-arrow">↗</span>
-        </div>
-        <p class="topic-desc">Scenario-based notes and examples to prepare for the Azure AI Engineer Associate exam.</p>
-        <div class="topic-chip-row">
-          <span class="topic-chip">azure</span>
-          <span class="topic-chip">ai-102</span>
-        </div>
-      </a>
+          <a class="topic-card" href="Copilot Studio/copilotstudio.html">
+            <div class="topic-tag">Copilot</div>
+            <div class="topic-title">
+              <span>Copilot Studio</span>
+              <span class="topic-arrow">↗</span>
+            </div>
+            <p class="topic-desc">Design and orchestration notes for building copilots using Microsoft Copilot Studio.</p>
+            <div class="topic-chip-row">
+              <span class="topic-chip">microsoft</span>
+              <span class="topic-chip">copilot</span>
+            </div>
+          </a>
 
-      <a class="topic-card" href="connection string/connectionstring.html">
-        <div class="topic-tag">Reference</div>
-        <div class="topic-title">
-          <span>Connection String Library</span>
-          <span class="topic-arrow">↗</span>
-        </div>
-        <p class="topic-desc">Copy‑ready connection strings across SQL, NoSQL, vector DBs, cloud services, and messaging systems.</p>
-        <div class="topic-chip-row">
-          <span class="topic-chip">databases</span>
-          <span class="topic-chip">cloud</span>
-        </div>
-      </a>
+          <a class="topic-card" href="Dialog CX/dialogcx.html">
+            <div class="topic-tag">Conversational AI</div>
+            <div class="topic-title">
+              <span>Dialog CX</span>
+              <span class="topic-arrow">↗</span>
+            </div>
+            <p class="topic-desc">Google Cloud’s low‑code platform for building chatbots and voicebots, with design best practices.</p>
+            <div class="topic-chip-row">
+              <span class="topic-chip">google cloud</span>
+              <span class="topic-chip">chat & voice</span>
+            </div>
+          </a>
 
-      <a class="topic-card" href="Copilot Studio/copilotstudio.html">
-        <div class="topic-tag">Copilot</div>
-        <div class="topic-title">
-          <span>Copilot Studio</span>
-          <span class="topic-arrow">↗</span>
+          <a class="topic-card" href="AmazonLEX/lex.html">
+            <div class="topic-tag">Conversational AI</div>
+            <div class="topic-title">
+              <span>Amazon Lex · Low Code</span>
+              <span class="topic-arrow">↗</span>
+            </div>
+            <p class="topic-desc">Hands-on guide to building low-code chatbots and voice bots on AWS using Amazon Lex.</p>
+            <div class="topic-chip-row">
+              <span class="topic-chip">aws</span>
+              <span class="topic-chip">lex</span>
+            </div>
+          </a>
         </div>
-        <p class="topic-desc">Design and orchestration notes for building copilots using Microsoft Copilot Studio.</p>
-        <div class="topic-chip-row">
-          <span class="topic-chip">microsoft</span>
-          <span class="topic-chip">copilot</span>
-        </div>
-      </a>
+      </div>
 
-      <a class="topic-card" href="CrewAI/crewai.html">
-        <div class="topic-tag">Agents & Crews</div>
-        <div class="topic-title">
-          <span>CrewAI</span>
-          <span class="topic-arrow">↗</span>
+      <div class="topic-section">
+        <div class="topic-section-header">
+          <div class="topic-section-title">LLM Frameworks</div>
+          <div class="topic-section-tagline">Building and orchestrating LLM-powered applications.</div>
         </div>
-        <p class="topic-desc">Patterns for coordinating “crews” of specialized agents to solve complex tasks.</p>
-        <div class="topic-chip-row">
-          <span class="topic-chip">agents</span>
-          <span class="topic-chip">coordination</span>
+        <div class="topics-grid">
+          <a class="topic-card" href="Langgraph & Langchain/langraph&langchain.html">
+            <div class="topic-tag">Framework Comparison</div>
+            <div class="topic-title">
+              <span>LangGraph & LangChain</span>
+              <span class="topic-arrow">↗</span>
+            </div>
+            <p class="topic-desc">Side‑by‑side exploration of graph- and chain-based LLM application patterns.</p>
+            <div class="topic-chip-row">
+              <span class="topic-chip">langgraph</span>
+              <span class="topic-chip">langchain</span>
+            </div>
+          </a>
         </div>
-      </a>
+      </div>
 
-      <a class="topic-card" href="Dialog CX/dialogcx.html">
-        <div class="topic-tag">Conversational AI</div>
-        <div class="topic-title">
-          <span>Dialog CX</span>
-          <span class="topic-arrow">↗</span>
+      <div class="topic-section">
+        <div class="topic-section-header">
+          <div class="topic-section-title">Courses & Certifications</div>
+          <div class="topic-section-tagline">Exam prep and structured learning paths.</div>
         </div>
-        <p class="topic-desc">Google Cloud’s low‑code platform for building chatbots and voicebots, with design best practices.</p>
-        <div class="topic-chip-row">
-          <span class="topic-chip">google cloud</span>
-          <span class="topic-chip">chat & voice</span>
+        <div class="topics-grid">
+          <a class="topic-card" href="AI102 Azure AI Engineer Course/azureAI102.html">
+            <div class="topic-tag">Certification Prep</div>
+            <div class="topic-title">
+              <span>Azure AI-102 Notes</span>
+              <span class="topic-arrow">↗</span>
+            </div>
+            <p class="topic-desc">Scenario-based notes and examples to prepare for the Azure AI Engineer Associate exam.</p>
+            <div class="topic-chip-row">
+              <span class="topic-chip">azure</span>
+              <span class="topic-chip">ai-102</span>
+            </div>
+          </a>
         </div>
-      </a>
+      </div>
 
-      <a class="topic-card" href="AmazonLEX/lex.html">
-        <div class="topic-tag">Conversational AI</div>
-        <div class="topic-title">
-          <span>Amazon Lex · Low Code</span>
-          <span class="topic-arrow">↗</span>
+      <div class="topic-section">
+        <div class="topic-section-header">
+          <div class="topic-section-title">Architecture & Reference</div>
+          <div class="topic-section-tagline">Design decisions, patterns, and ready-to-use snippets.</div>
         </div>
-        <p class="topic-desc">Hands-on guide to building low-code chatbots and voice bots on AWS using Amazon Lex.</p>
-        <div class="topic-chip-row">
-          <span class="topic-chip">aws</span>
-          <span class="topic-chip">lex</span>
-        </div>
-      </a>
+        <div class="topics-grid">
+          <a class="topic-card" href="connection string/connectionstring.html">
+            <div class="topic-tag">Reference</div>
+            <div class="topic-title">
+              <span>Connection String Library</span>
+              <span class="topic-arrow">↗</span>
+            </div>
+            <p class="topic-desc">Copy‑ready connection strings across SQL, NoSQL, vector DBs, cloud services, and messaging systems.</p>
+            <div class="topic-chip-row">
+              <span class="topic-chip">databases</span>
+              <span class="topic-chip">cloud</span>
+            </div>
+          </a>
 
-      <a class="topic-card" href="Architecture Decision - Cosultation Level/Architecturedecision.html">
-        <div class="topic-tag">Architecture</div>
-        <div class="topic-title">
-          <span>Architecture Decision Guide</span>
-          <span class="topic-arrow">↗</span>
+          <a class="topic-card" href="Architecture Decision - Cosultation Level/Architecturedecision.html">
+            <div class="topic-tag">Architecture</div>
+            <div class="topic-title">
+              <span>Architecture Decision Guide</span>
+              <span class="topic-arrow">↗</span>
+            </div>
+            <p class="topic-desc">Consultation-level guide for choosing AI architectures and patterns for real-world solutions.</p>
+            <div class="topic-chip-row">
+              <span class="topic-chip">design</span>
+              <span class="topic-chip">trade‑offs</span>
+            </div>
+          </a>
         </div>
-        <p class="topic-desc">Consultation-level guide for choosing AI architectures and patterns for real-world solutions.</p>
-        <div class="topic-chip-row">
-          <span class="topic-chip">design</span>
-          <span class="topic-chip">trade‑offs</span>
-        </div>
-      </a>
+      </div>
     </section>
 
     <footer class="footer">
